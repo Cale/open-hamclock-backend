@@ -1,0 +1,16 @@
+1. fetchIPGeoloc.pl
+2. fetchBandConditions.pl
+3. wx.pl
+4. /RSS/web15rss.pl
+5. /NOAASpaceWX/Bz.txt
+6. /NOAASpaceWX/xray.txt
+7. /NOAASpaceWX/noaaswx.txt
+8. /NOAASpaceWX/rank2_coeffs.txt
+9. /dst/dst.txt
+10. /solar-wind/swind-24hr.txt
+11. /Aurora/aurora.txt
+12. /drap/stats.txt
+13. /solarflux/solarflux-99.txt
+14. maps/map-D-660x330-Clouds.bmp.z (zlib compressed from NASA?)
+15. maps/maps-N-660x330-MUF-RT.bmp.z (zlib compressed from NASA?)
+16. maps/maps-D-660x330-DRAP-S.bmp.z (zlib compressed from NASA?)
