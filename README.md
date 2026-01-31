@@ -51,7 +51,8 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [ ] SDO/f_304_170.bmp.z
 - [ ] fetchVOACAP-MUF.pl?YEAR=2026&MONTH=1&UTC=17&TXLAT=&TXLNG=&PATH=0&WATTS=100&WIDTH=660&HEIGHT=330&MHZ=0.00&TOA=3.0&MODE=19&TOA=3.0
 - [ ] fetchVOACAP-TOA.pl?YEAR=2026&MONTH=1&UTC=17&TXLAT=&TXLNG=&PATH=0&WATTS=100&WIDTH=660&HEIGHT=330&MHZ=14.10&TOA=3.0&MODE=19&TOA=3.0
-- [ ] RSS/web15rss.pl
+- [x] ham/HamClock/RSS/web15rss.pl
+- [x] ham/HamClock/version.pl
 - [x] HamWeekly.com RSS feed generator
 - [x] AR Newsline RSS feed generator
 - [x] NG3K.com feed generator
