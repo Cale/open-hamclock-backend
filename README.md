@@ -7,6 +7,7 @@ MIT - this is free. Not for commercial use
 # Project Completion Status
 - [x] Bz.txt generator
 - [x] wx.pl working
+- [x] Xray.txt generator
 - [ ] aurora.txt generator
 - [ ] VOACAP map generator
 - [x] IP geolocation fetch implemented - requires free tier 1000 req per day account and API key
