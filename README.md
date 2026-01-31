@@ -17,6 +17,7 @@ MIT - this is free. Not for commercial use
 - [ ] fetchVOACAPArea.pl
 - [ ] worldwx/wx.txt
 - [ ] solar-flux/solarflux-99.txt
+- [ ] geomag/kindex.txt
 - [x] HamWeekly.com RSS feed generator
 - [x] AR Newsline RSS feed generator
 - [x] zlib decompress utilty script
