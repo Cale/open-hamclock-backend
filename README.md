@@ -100,3 +100,12 @@ You will need:
   sudo lighttpd -tt -f /etc/lighttpd/lighttpd.conf
   sudo lighttpd-enable-mod hamclock
   sudo systemctl restart lighttpd
+
+```
+
+# Crontab Setup
+
+```bash
+sudo crontab -u www-data -e
+add the contents of the scripts/crontab file
+```
