@@ -29,6 +29,8 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [ ] solar-wind/swind-24hr.txt
 - [ ] cities2.txt
 - [ ] ssn/ssn-31.txt
+- [ ] ONTA/onta.txt
+- [ ] contests/contests311.txt
 - [ ] dxpeds/dxpeditions.txt
 - [ ] NOAASpaceWX/noaaswx.txt
 - [ ] maps/map-D-2640x1320-Countries.bmp.z
