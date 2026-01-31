@@ -28,7 +28,8 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] geomag/kindex.txt
 - [ ] dst/dst.txt
 - [ ] drap/stats.txt
-- [ ] solar-wind/swind-24hr.txt
+- [x] solar-wind/swind-24hr.txt generator
+- [ ] cron job to put swind-24hr.txt in the solar-wind location
 - [x] cities2.txt (static city file - no urgency to update this for maybe 5 years or more)
 - [ ] ssn/ssn-31.txt
 - [ ] ONTA/onta.txt
