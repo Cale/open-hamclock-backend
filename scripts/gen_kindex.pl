@@ -11,7 +11,7 @@ my $URL = 'https://services.swpc.noaa.gov/text/daily-geomagnetic-indices.txt';
 # HamClock constants (derived from client + observed file)
 my $KP_NV = 45;
 
-my $OUT = 'kindex.txt';
+my $OUT = '/opt/hamclock-backend/htdocs/ham/HamClock/geomag/kindex.txt';
 
 my $ua = LWP::UserAgent->new(
     timeout => 20,
