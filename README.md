@@ -41,8 +41,8 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [ ] NOAASpaceWX/noaaswx.txt
 - [x] maps/map-D-2640x1320-Countries.bmp.z - this is just a static map of the world, won't change often
 - [x] maps/map-N-2640x1320-Countries.bmp.z - this is just a static map of the world, won't change often
-- [ ] maps/map-D-660x330-Clouds.bmp.z
-- [ ] maps/map-N-660x330-Clouds.bmp.z
+- [x] maps/map-D-660x330-Clouds.bmp.z
+- [x] maps/map-N-660x330-Clouds.bmp.z
 - [x] maps/map-D-660x330-Terrain.bmp.z - this is just a static map of the world, won't change often
 - [x] maps/map-N-660x330-Terrain.bmp.z - this just a static map of the world, won't change often
 - [x] maps/map-D-660x330-DRAP-S.bmp.z
