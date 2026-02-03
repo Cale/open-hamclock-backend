@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# run as: 
+# NIGHT_BOLD_PASSES=0 NIGHT_WHITE_THRESH=50 bash /opt/hamclock-backend/scripts/update_aurora_maps.sh
+
 OUTDIR="/opt/hamclock-backend/htdocs/ham/HamClock/maps"
 W=660
 H=330
