@@ -11,6 +11,13 @@ MIT - this is free. Not for commercial use
 # Interoperability
 This project generates map and data artifacts in the same formats expected by the HamClock client (e.g. zlib compressed BMP RGB565 map tiles) to support interoperability. This project is not affiliated with or endorsed by the original HamClock project or any third party. Data products are derived from public upstream sources such as NOAA SWPC and NASA
 
+# Compatibility
+- [ ] Ubuntu 22.x LTS
+- [ ] Raspberry Pi
+- [ ] Windows Subsystem for Linux
+- [ ] Inovato Quadro
+- [ ] Mac 
+
 # Project Completion Status
 
 HamClock requests about 40+ artifacts. I have locally replicated all of them that I could find.
