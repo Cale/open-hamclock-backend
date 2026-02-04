@@ -131,6 +131,7 @@ Images with N means Night and D means Day
 - sudo apt install -y libtext-csv-xs-perl
 - sudo apt install -y librsvg2-bin
 - sudo apt install -y python3
+- sudo apt install -y python3-pip
 - sudo apt install -y python3-pyproj
 - sudo apt install -y python3-dev
 - sudo apt install -y build-essential gfortran gcc make libc6-dev \\\
