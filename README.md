@@ -64,9 +64,7 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] maps/map-N-660x330-Aurora.bmp.z
 - [x] maps/map-D-660x330-Wx-mB.bmp.z
 - [x] maps/map-N-660x330-Wx-mB.bmp.z
-- [x] SDO/f_304_170.bmp.z
-- [ ] SDO/f_211_193_171_170.bmp.z
-- [ ] SDO/latest_170_HMIB.bmp.z
+- [x] SDO/*
 
 ### Dynamic Web Endpoints
 - [x] ham/HamClock/RSS/web15rss.pl
