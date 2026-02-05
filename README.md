@@ -54,7 +54,7 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] solar-wind/swind-24hr.txt
 - [x] ssn/ssn-31.txt
 - [x] ONTA/onta.txt
-- [ ] contests/contests311.txt (this may stay broken until an agreement is made based on the site's ToS https://www.contestcalendar.com/terms.php)
+- [x] contests/contests311.txt
 - [x] dxpeds/dxpeditions.txt
 - [x] NOAASpaceWX/noaaswx.txt
 
@@ -202,6 +202,7 @@ Most cron-jobs will log to /opt/hamclock-backend/logs
 - Once per day at 12:30am: /opt/hamclock-backend/scripts/gen_ng3k.pl
 - Once per day at 12:35am: /opt/hamclock-backend/scripts/merge_dxpeditions.pl
 - Every 12 hours: /opt/hamclock-backend/scripts/gen_kindex.pl
+- Every 8 hours: /opt/hamclock-backend/scripts/gen_contest-calendar.pl
 - Every 3 hours: /opt/hamclock-backend/scripts/build_esats.pl
 - Every hour: /opt/hamclock-backend/scripts/update_clouds_maps.sh
 - Every hour: /opt/hamclock-backend/scripts/update_drap_maps.sh
