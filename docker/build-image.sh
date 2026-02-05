@@ -2,8 +2,13 @@
 
 # Variables to set
 IMAGE_BASE=hamclock-be
-TAG=test
 VOACAP_VERSION=v.0.7.6
+FOO=$(git describe --exact-match --tags)
+if [ $? -ne 0 ]; then
+    echo "Not currently on a tag. Using 'latest'."
+    TAG=latest
+    #TAG=$(git rev-parse --short HEAD)
+fi
 
 # Don't set anything past here
 IMAGE=$IMAGE_BASE:$TAG
