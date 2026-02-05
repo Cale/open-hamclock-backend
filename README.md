@@ -41,7 +41,7 @@ This project generates map and data artifacts in the same formats expected by th
 ```bash
    # Confirmed working in aws t3-micro Ubuntu 24.x LTS instance
    wget https://raw.githubusercontent.com/BrianWilkinsFL/open-hamclock-backend/refs/heads/main/aws/install_ohb.sh
-   sudo bash install_obs.sh
+   sudo bash install_ohb.sh
 ```
 
 ## Project Completion Status
