@@ -1,14 +1,14 @@
 services:
   web:
-    container_name: hamclock-be
+    container_name: __IMAGE_BASE__
     image: __IMAGE__
     restart: unless-stopped
     networks:
-      - hamclock
+      - __IMAGE_BASE__
     ports:
       - :80:80
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/ham/HamClock/version.pl"]
       timeout: "5s"
       start_period: "20s"
     logging:
@@ -17,13 +17,11 @@ services:
         max-file: "2"
 
 networks:
-  hamclock:
+  __IMAGE_BASE__:
     driver: bridge
-    name: hamclock
+    name: __IMAGE_BASE__
     enable_ipv6: true
     ipam:
      driver: default
-     config:
-       - subnet: 172.19.0.0/16
     driver_opts:
-      com.docker.network.bridge.name: hamclock
+      com.docker.network.bridge.name: __IMAGE_BASE__

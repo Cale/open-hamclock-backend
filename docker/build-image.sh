@@ -2,8 +2,13 @@
 
 # Variables to set
 IMAGE_BASE=hamclock-be
-TAG=test
 VOACAP_VERSION=v.0.7.6
+TAG=$(git describe --exact-match --tags 2>/dev/null)
+if [ $? -ne 0 ]; then
+    echo "Not currently on a tag. Using 'latest'."
+    TAG=latest
+    #TAG=$(git rev-parse --short HEAD)
+fi
 
 # Don't set anything past here
 IMAGE=$IMAGE_BASE:$TAG
@@ -20,6 +25,7 @@ fi
 
 # make the docker-compose file
 sed "s/__IMAGE__/$IMAGE/" docker-compose.yml.tmpl > docker-compose.yml
+sed -i "s/__IMAGE_BASE__/$IMAGE_BASE/" docker-compose.yml
 
 if $(docker image list --format '{{.Repository}}:{{.Tag}}' | grep -qs $IMAGE) ; then
     echo "The docker image for '$IMAGE' already exists. Please remove it if you want to rebuild."
@@ -28,7 +34,8 @@ if $(docker image list --format '{{.Repository}}:{{.Tag}}' | grep -qs $IMAGE) ; 
 fi
 
 # Build the image
-echo "Currently building version $TAG of $IMAGE_BASE"
+echo
+echo "Currently building version '$TAG' of '$IMAGE_BASE'"
 pushd "$HERE/.." >/dev/null
 docker build --rm -t $IMAGE -f docker/Dockerfile .
 popd >/dev/null
