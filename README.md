@@ -14,7 +14,7 @@ Discord is where we can collaborate, troubleshoot, and exchange ideas — no RF 
 https://discord.gg/k2Nmdjup
 
 ## Attribution
-- MUF-RT: MUF-RT data for this map are from GIRO collected and used by permission from KC2G.
+- [MUF-RT](https://prop.kc2g.com/) Note: MUF-RT data for this map are from GIRO collected and used by permission from KC2G.
 - NOAA
 - NASA
 - [HamWeekly.com](https://hamweekly.com/)
