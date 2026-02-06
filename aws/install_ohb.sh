@@ -165,12 +165,84 @@ echo -e "${BLU}==> Initial artifact generation${NC}"
 
 sudo chmod +x "$BASE/scripts/"*
 
-sudo -u www-data bash <<EOF
-cd "$BASE/scripts" || exit 1
-for f in gen_ssn.pl gen_kp.pl gen_aurora.pl update_all_sdo.sh; do
-  [ -f "\$f" ] && ./"\$f" || echo "Skipping \$f"
-done
-EOF
+#sudo -u www-data bash <<EOF
+#cd "$BASE/scripts" || exit 1
+#for f in gen_ssn.pl gen_kp.pl gen_aurora.pl update_all_sdo.sh; do
+#  [ -f "\$f" ] && ./"\$f" || echo "Skipping \$f"
+#done
+#EOF
+
+# ---------- initial pre-seed ----------
+STEP=$((STEP+1)); progress $STEP $STEPS
+echo -e "${BLU}==> Initial backend pre-seed${NC}"
+
+sudo mkdir -p "$BASE/logs"
+sudo chown -R www-data:www-data "$BASE/logs"
+
+echo "Pre-seed running as:"
+sudo -u www-data id
+
+seed_spinner() {
+  local pid=$1
+  local spin='-\|/'
+  local i=0
+  while kill -0 $pid 2>/dev/null; do
+    i=$(( (i+1) %4 ))
+    printf "\r${YEL}[%c] Working...${NC}" "${spin:$i:1}"
+    sleep .1
+  done
+  printf "\r${GRN}[✓] Done           ${NC}\n"
+}
+run_perl() {
+  local f=$1
+  local log="$BASE/logs/${f%.pl}.log"
+  echo -e "${YEL}Running perl $f${NC}"
+  sudo -u www-data perl "$BASE/scripts/$f" >> "$log" 2>&1 &
+  seed_spinner $!
+}
+
+run_sh() {
+  local f=$1
+  local log="$BASE/logs/${f%.sh}.log"
+  echo -e "${YEL}Running bash $f${NC}"
+  sudo -u www-data bash "$BASE/scripts/$f" >> "$log" 2>&1 &
+  seed_spinner $!
+}
+
+run_flock_sh() {
+  local f=$1
+  local log="$BASE/logs/${f%.sh}.log"
+  echo -e "${YEL}Running flocked $f${NC}"
+  sudo -u www-data flock -n /tmp/update_sdo.lock bash "$BASE/scripts/$f" >> "$log" 2>&1 &
+  seed_spinner $!
+}
+
+
+# ---- ordered execution ----
+
+run_sh  gen_solarflux-history.sh
+run_perl gen_swind_24hr.pl
+run_sh  update_pota_parks_cache.sh
+run_perl update_solarflux_cache.pl
+run_sh  update_wx_mb_maps.sh
+run_perl publish_solarflux_99.pl
+run_perl gen_dxnews.pl
+run_perl gen_ng3k.pl
+run_perl merge_dxpeditions.pl
+run_sh  gen_contest-calendar.sh
+run_perl gen_kindex.pl
+run_perl build_esats.pl
+run_sh  update_cloud_maps.sh
+run_sh  update_drap_maps.sh
+run_sh  gen_dst.sh
+run_sh  gen_aurora.sh
+run_sh  gen_noaaswx.sh
+run_sh  update_sdo_304.sh
+run_sh  update_aurora_maps.sh
+run_perl gen_onta.pl
+run_sh  bzgen.sh
+run_sh  gen_drap.sh
+run_perl genxray.pl
 
 # ---------- footer ----------
 VERSION=$(git -C "$BASE" describe --tags --dirty --always 2>/dev/null || echo "unknown")
@@ -187,3 +259,4 @@ echo -e "${GRN}===========================================${NC}"
 echo
 echo -e "${YEL}If using WSL2 ensure systemd=true in /etc/wsl.conf${NC}"
 echo
+
