@@ -53,6 +53,38 @@ This project generates map and data artifacts in the same formats expected by th
    wget https://raw.githubusercontent.com/BrianWilkinsFL/open-hamclock-backend/refs/heads/main/aws/install_ohb.sh
    sudo bash install_ohb.sh
 ```
+## Selecting map image sizes during install
+
+By default, OHB generates the full HamClock size set:
+
+`660x330,1320x660,1980x990,2640x1320,3960x1980,5280x2640,5940x2970,7920x3960`
+
+To install with a custom size set, pass one of the options below:
+
+### Option A: Comma-separated list
+
+```bash
+chmod +x ./install_ohb.sh
+sudo ./install_ohb.sh --sizes "660x330,1320x660,1980x990"
+```
+### Option B: Repeat --size
+chmod +x ./install_ohb.sh
+sudo ./install_ohb.sh --size 660x330 --size 1320x660 --size 1980x990
+Install script will store configuration under /opt/hamclock-backend/etc/ohb-sizes.conf
+
+```bash
+# Canonical default list (keep in sync with HamClock)
+DEFAULT_SIZES=( \
+  "660x330" \
+  "1320x660" \
+  "1980x990" \
+  "2640x1320" \
+  "3960x1980" \
+  "5280x2640" \
+  "5940x2970" \
+  "7920x3960" \
+)
+```
 
 ## Starting HamClock
 HamClock is hard-coded to use the clearskyinstitute.com URL. You can override to use a new backend by starting HamClock with the -b option
