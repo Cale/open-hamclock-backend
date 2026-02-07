@@ -43,4 +43,6 @@ popd >/dev/null
 # basic info
 echo
 echo "Completed building '$IMAGE'."
-echo "To start a container, try: 'docker-compose up -d'."
+echo "To start a container, setup first and then launch docker-compose:"
+echo "    docker-ohb-setup.sh"
+echo "    docker-compose up -d"
