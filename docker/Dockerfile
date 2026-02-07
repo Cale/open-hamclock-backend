@@ -43,7 +43,6 @@ RUN cd /opt/hamclock-backend && \
         cache \
         data \
         htdocs && \
-    mv ham htdocs/ && \
     mv  docker/run.sh /opt && \
     sed 's/^\([^ #]\+[ ]\+\)\{5\}\([^>]\+\)\([> ]\+\)\?\([^ ]*\).*$/\2\3\4/' scripts/crontab > prime_crontabs.sh && \
     # \
@@ -51,7 +50,7 @@ RUN cd /opt/hamclock-backend && \
     chown -R www-data:www-data . && \
     chmod +x scripts/* prime_crontabs.sh /opt/run.sh && \
     # \
-    # fontconfig needs a writeable cache director \
+    # fontconfig needs a writeable cache directory \
     mkdir -p /var/www/.fontconfig && \
     chown -R www-data:www-data /var/www/.fontconfig && \
     # \
