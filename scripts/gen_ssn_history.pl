@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use LWP::UserAgent;
+use File::Copy qw(move);
 
 my $URL = 'https://www.sidc.be/silso/DATA/SN_m_tot_V2.0.csv';
 my $OUT = '/opt/hamclock-backend/htdocs/ham/HamClock/ssn/ssn-history.txt';
@@ -48,7 +49,7 @@ my $tmp = "$OUT.tmp";
 open my $fh, '>', $tmp or die "ERROR: cannot write temp file\n";
 print $fh "$_\n" for @rows;
 close $fh;
-rename $tmp, $OUT or die "ERROR: rename failed\n";
+move $tmp, $OUT or die "ERROR: move failed\n";
 
 exit 0;
 

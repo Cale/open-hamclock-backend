@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use File::Copy qw(move);
 
 my $DXNEWS = '/opt/hamclock-backend/htdocs/ham/HamClock/dxpeds/dxnews.tmp';
 my $NG3K   = '/opt/hamclock-backend/htdocs/ham/HamClock/dxpeds/ng3k.tmp';
@@ -81,5 +82,5 @@ for my $k (sort {
 }
 
 close $out;
-rename $TMP, $OUT or die "rename failed\n";
+move $TMP, $OUT or die "move failed\n";
 
