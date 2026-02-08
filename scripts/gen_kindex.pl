@@ -6,6 +6,7 @@ use LWP::UserAgent;
 use File::Temp qw(tempfile);
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
+use File::Copy qw(move);
 
 # NOAA source (daily geomagnetic indices; includes 3-hour planetary Kp as last 8 fields)
 my $URL = 'https://services.swpc.noaa.gov/text/daily-geomagnetic-indices.txt';
@@ -78,7 +79,7 @@ my ($fh, $tmp) = tempfile('kindexXXXX', DIR => $TMPDIR, UNLINK => 0);
 print $fh "$_\n" for @kp_series;
 close $fh or die "ERROR: close($tmp) failed: $!\n";
 
-rename $tmp, $OUT or die "ERROR: rename($tmp -> $OUT) failed: $!\n";
+move $tmp, $OUT or die "ERROR: move($tmp -> $OUT) failed: $!\n";
 
 exit 0;
 

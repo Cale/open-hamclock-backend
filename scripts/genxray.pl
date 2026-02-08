@@ -5,7 +5,7 @@ use warnings;
 use LWP::UserAgent;
 use JSON qw(decode_json);
 use File::Temp qw(tempfile);
-use File::Copy 'move';
+use File::Copy qw(move);
 
 # NOAA GOES X-ray source (primary satellite)
 my $URL = 'https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json';

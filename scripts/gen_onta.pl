@@ -6,6 +6,7 @@ use LWP::UserAgent;
 use JSON qw(decode_json);
 use Time::Local;
 use Text::CSV_XS;
+use File::Copy qw(move);
 
 my $URL   = 'https://api.pota.app/spot';
 my $OUT   = '/opt/hamclock-backend/htdocs/ham/HamClock/ONTA/onta.txt';
@@ -151,5 +152,5 @@ for my $r (@out) {
 }
 
 close $fh;
-rename $TMP, $OUT or die "Rename failed $TMP -> $OUT: $!\n";
+move $TMP, $OUT or die "move failed $TMP -> $OUT: $!\n";
 

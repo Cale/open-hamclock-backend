@@ -6,6 +6,7 @@ use LWP::UserAgent;
 use JSON qw(decode_json encode_json);
 use File::Path qw(make_path);
 use Fcntl qw(:flock);
+use File::Copy qw(move);
 
 # -----------------------
 # Config
@@ -62,7 +63,7 @@ sub write_json_atomic {
     open my $fh, '>', $tmp or die "ERROR: cannot write $tmp: $!\n";
     print {$fh} encode_json($obj);
     close $fh;
-    rename $tmp, $path or die "ERROR: rename $tmp -> $path failed: $!\n";
+    move $tmp, $path or die "ERROR: move $tmp -> $path failed: $!\n";
 }
 
 # -----------------------
@@ -257,7 +258,7 @@ for my $lon (@LONS) {
 }
 
 close $out;
-rename $tmp_out, $OUT_TXT or die "ERROR: rename $tmp_out -> $OUT_TXT failed: $!\n";
+move $tmp_out, $OUT_TXT or die "ERROR: move $tmp_out -> $OUT_TXT failed: $!\n";
 
 exit 0;
 
