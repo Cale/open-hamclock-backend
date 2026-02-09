@@ -2,45 +2,9 @@
 set -euo pipefail
 export LC_ALL=C
 
-# How to run: sudo -u www-data PAD_FRAC_X=-0.02 PAD_FRAC_Y=-0.08 BASE_PAD_Y=-30 bash update_drap_maps.sh 
-
 OUTDIR="/opt/hamclock-backend/htdocs/ham/HamClock/maps"
-
-#SIZES=(
-#  "660x330"
-#  "1320x660"
-#  "1980x990"
-#  "2640x1320"
-#  "3960x1980"
-#  "5280x2640"
-#  "5940x2970"
-#  "7920x3960"
-#)
-
-# Load unified size list
-# shellcheck source=/dev/null
-source "/opt/hamclock-backend/scripts/lib_sizes.sh"
-ohb_load_sizes
-
-SRC_URL="https://services.swpc.noaa.gov/images/d-rap/global.png"
-
-REF_BASE_W=660
-REF_BASE_H=330
-REF_CROP_W="${REF_CROP_W:-544}"
-REF_CROP_H="${REF_CROP_H:-267}"
-
-# Your tuned proportional padding (applies to sizes != 660x330)
-PAD_FRAC_X="${PAD_FRAC_X:--0.02}"
-PAD_FRAC_Y="${PAD_FRAC_Y:--0.08}"
-
-# Extra pixel trim for ONLY the 660x330 case (negative trims more bottom legend)
-BASE_PAD_Y="${BASE_PAD_Y:--12}"
-
-CROP_X=0
-CROP_Y=0
-
-TMPDIR="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR"' EXIT
+TMPROOT="/opt/hamclock-backend/tmp"
+URL="https://services.swpc.noaa.gov/images/d-rap/global.png"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "ERROR: missing command: $1" >&2; exit 1; }; }
 need curl
@@ -48,17 +12,43 @@ need convert
 need python3
 need install
 
-mkdir -p "$OUTDIR"
+mkdir -p "$OUTDIR" "$TMPROOT"
 
-src_png="$TMPDIR/drap_global.png"
-curl -fsS -A "open-hamclock-backend/1.0" --retry 2 --retry-delay 2 "$SRC_URL" -o "$src_png"
+# Load sizes from lib_sizes.sh
+# shellcheck source=/dev/null
+source "/opt/hamclock-backend/scripts/lib_sizes.sh"
+ohb_load_sizes   # populates SIZES=(...) per OHB conventions
 
+# Temp dir under /opt/hamclock-backend/tmp (www-data writable)
+TMPDIR="$(mktemp -d -p "$TMPROOT" drap.XXXXXX)"
+trap 'rm -rf "$TMPDIR"' EXIT
+
+IN="$TMPDIR/drap.png"
+curl -fsSL -A "open-hamclock-backend/1.0" --retry 2 --retry-delay 2 -o "$IN" "$URL"
+
+# Source crop rectangle (in NOAA source pixels)
+SRC_CROP_W=660
+SRC_CROP_H=330
+SRC_XOFF=9
+SRC_YOFF=0
+
+# Crop once, reuse for all sizes (avoids repeated decode)
+CROPPED="$TMPDIR/drap_cropped.png"
+convert "$IN" -crop "${SRC_CROP_W}x${SRC_CROP_H}+${SRC_XOFF}+${SRC_YOFF}" +repage "$CROPPED"
+
+zlib_compress() {
+  local in="$1"
+  local out="$2"
+  python3 - <<'PY' "$in" "$out"
+import zlib, sys
+data = open(sys.argv[1], "rb").read()
+open(sys.argv[2], "wb").write(zlib.compress(data, 9))
+PY
+}
+
+# Write BMPv4 (BITMAPV4HEADER), 16bpp RGB565, top-down
 make_bmp_v4_rgb565_topdown() {
-  local inraw="$1"
-  local outbmp="$2"
-  local W="$3"
-  local H="$4"
-
+  local inraw="$1" outbmp="$2" W="$3" H="$4"
   python3 - <<'PY' "$inraw" "$outbmp" "$W" "$H"
 import struct, sys
 inraw, outbmp, W, H = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
@@ -71,25 +61,28 @@ if len(raw) != exp:
 pix = bytearray(W*H*2)
 j = 0
 for i in range(0, len(raw), 3):
-    r = raw[i]; g = raw[i+1]; b = raw[i+2]
-    v = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+    r = raw[i]
+    g = raw[i+1]
+    b = raw[i+2]
+    v = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)  # RGB565
     pix[j:j+2] = struct.pack("<H", v)
     j += 2
 
-bfOffBits = 14 + 108  # 122
+# BMP headers
+bfOffBits = 14 + 108  # filehdr (14) + BITMAPV4HEADER (108)
 bfSize = bfOffBits + len(pix)
 filehdr = struct.pack("<2sIHHI", b"BM", bfSize, 0, 0, bfOffBits)
 
 biSize = 108
 biWidth = W
-biHeight = -H
+biHeight = -H              # top-down DIB
 biPlanes = 1
 biBitCount = 16
-biCompression = 3
+biCompression = 3          # BI_BITFIELDS
 biSizeImage = len(pix)
 
 rmask, gmask, bmask, amask = 0xF800, 0x07E0, 0x001F, 0x0000
-cstype = 0x73524742  # 'sRGB'
+cstype = 0x73524742        # 'sRGB'
 endpoints = b"\x00"*36
 gamma = b"\x00"*12
 
@@ -101,81 +94,49 @@ v4hdr = struct.pack(
   + struct.pack("<I", cstype) + endpoints + gamma
 
 with open(outbmp, "wb") as f:
-    f.write(filehdr); f.write(v4hdr); f.write(pix)
+    f.write(filehdr)
+    f.write(v4hdr)
+    f.write(pix)
 
+# quick sanity
 with open(outbmp, "rb") as f:
     if f.read(2) != b"BM":
-        raise SystemExit("BAD BMP: missing BM signature")
+        raise SystemExit("Bad BMP signature")
 PY
 }
 
-zlib_compress() {
-  local in="$1"
-  local out="$2"
-  python3 - <<'PY' "$in" "$out"
-import zlib, sys
-data = open(sys.argv[1], "rb").read()
-open(sys.argv[2], "wb").write(zlib.compress(data, 9))
-PY
-}
+for sz in "${SIZES[@]}"; do
+  W="${sz%x*}"
+  H="${sz#*x}"
 
-compute_crop_wh() {
-  local W="$1" H="$2"
-  python3 - <<PY
-import math
-W=int("$W"); H=int("$H")
-REFW=int("$REF_BASE_W"); REFH=int("$REF_BASE_H")
-RCW=int("$REF_CROP_W"); RCH=int("$REF_CROP_H")
-pfx=float("$PAD_FRAC_X"); pfy=float("$PAD_FRAC_Y")
-base_pad_y=int("$BASE_PAD_Y")
-
-# Base proportional interior crop (works for all sizes, including 660x330)
-cw = int(math.floor((W * RCW) / REFW + 0.5))
-ch = int(math.floor((H * RCH) / REFH + 0.5))
-
-if W == REFW and H == REFH:
-    # tighten only 660x330 bottom
-    ch += base_pad_y
-else:
-    # proportional padding for other sizes
-    cw += int(math.floor(W * pfx + 0.5))
-    ch += int(math.floor(H * pfy + 0.5))
-
-cw = max(1, min(W, cw))
-ch = max(1, min(H, ch))
-print(cw, ch)
-PY
-}
-
-for wh in "${SIZES[@]}"; do
-  W="${wh%x*}"
-  H="${wh#*x}"
-
-  read -r CROP_W CROP_H < <(compute_crop_wh "$W" "$H")
-
-  echo "DRAP ${W}x${H}: crop ${CROP_W}x${CROP_H}+${CROP_X}+${CROP_Y}"
-
-  norm_png="$TMPDIR/drap_${W}x${H}_norm.png"
-  crop_png="$TMPDIR/drap_${W}x${H}_crop.png"
-  final_png="$TMPDIR/drap_${W}x${H}_final.png"
+  # Temp intermediates
+  resized_png="$TMPDIR/drap_${W}x${H}.png"
   raw_rgb="$TMPDIR/drap_${W}x${H}.rgb"
 
-  convert "$src_png" -alpha off -colorspace sRGB -resize "${W}x${H}!" "$norm_png"
-  convert "$norm_png" -crop "${CROP_W}x${CROP_H}+${CROP_X}+${CROP_Y}" +repage "$crop_png"
-  convert "$crop_png" -resize "${W}x${H}!" "$final_png"
-  convert "$final_png" -alpha off -colorspace sRGB -depth 8 "rgb:$raw_rgb"
+  # Final BMP names (tmp then installed to OUTDIR)
+  day_bmp_tmp="$TMPDIR/map-D-${W}x${H}-DRAP-S.bmp"
+  night_bmp_tmp="$TMPDIR/map-N-${W}x${H}-DRAP-S.bmp"
 
-  day_tmp="$TMPDIR/map-D-${W}x${H}-DRAP-S.bmp"
-  night_tmp="$TMPDIR/map-N-${W}x${H}-DRAP-S.bmp"
+  # Resize from canonical crop. Point/nearest reduces additional blur.
+  convert "$CROPPED" \
+    -resize "${W}x${H}!" \
+    +repage \
+    "$resized_png"
 
-  make_bmp_v4_rgb565_topdown "$raw_rgb" "$day_tmp" "$W" "$H"
-  cp -f "$day_tmp" "$night_tmp"
+  # Emit raw RGB888 bytes (exactly W*H*3)
+  convert "$resized_png" RGB:"$raw_rgb"
 
-  install -m 0644 "$day_tmp"   "$OUTDIR/map-D-${W}x${H}-DRAP-S.bmp"
-  install -m 0644 "$night_tmp" "$OUTDIR/map-N-${W}x${H}-DRAP-S.bmp"
+  # Convert raw -> BMPv4 RGB565 top-down (HamClock-friendly)
+  make_bmp_v4_rgb565_topdown "$raw_rgb" "$day_bmp_tmp" "$W" "$H"
+  cp -f "$day_bmp_tmp" "$night_bmp_tmp"
+
+  install -m 0644 "$day_bmp_tmp"   "$OUTDIR/map-D-${W}x${H}-DRAP-S.bmp"
+  install -m 0644 "$night_bmp_tmp" "$OUTDIR/map-N-${W}x${H}-DRAP-S.bmp"
 
   zlib_compress "$OUTDIR/map-D-${W}x${H}-DRAP-S.bmp" "$OUTDIR/map-D-${W}x${H}-DRAP-S.bmp.z"
   zlib_compress "$OUTDIR/map-N-${W}x${H}-DRAP-S.bmp" "$OUTDIR/map-N-${W}x${H}-DRAP-S.bmp.z"
+
+  echo "Wrote map-[DN]-${W}x${H}-DRAP-S.bmp.z"
 done
 
 echo "OK: DRAP maps updated into $OUTDIR"

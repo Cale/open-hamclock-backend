@@ -7,6 +7,7 @@ use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Temp qw(tempfile);
 use File::Copy qw(copy);
+use File::Copy qw(move);
 use Time::Piece;
 use Time::Seconds;
 
@@ -82,7 +83,7 @@ die "ERROR: NOAA parse failed (0 rows)\n" if $parsed == 0;
     my ($cofh, $copath) = tempfile('ssn-cache_XXXXXX', DIR => $out_dir, UNLINK => 0);
     close $cofh or die "ERROR: close(cache-out-temp-handle) failed: $!\n";
     copy($ctpath, $copath) or die "ERROR: copy($ctpath -> $copath) failed: $!\n";
-    rename($copath, $CACHE) or die "ERROR: rename($copath -> $CACHE) failed: $!\n";
+    move($copath, $CACHE) or die "ERROR: move($copath -> $CACHE) failed: $!\n";
 
     unlink $ctpath;
 }
@@ -120,12 +121,12 @@ for my $d (@dates) {
 }
 close $tfh or die "ERROR: close(temp) failed: $!\n";
 
-# Step 2: copy into output dir as a sibling temp file, then rename atomically
+# Step 2: copy into output dir as a sibling temp file, then move atomically
 my ($ofh, $opath) = tempfile('ssn-31_XXXXXX', DIR => $out_dir, UNLINK => 0);
 close $ofh or die "ERROR: close(out-temp-handle) failed: $!\n";  # will copy over it
 
 copy($tpath, $opath) or die "ERROR: copy($tpath -> $opath) failed: $!\n";
-rename($opath, $OUT) or die "ERROR: rename($opath -> $OUT) failed: $!\n";
+move($opath, $OUT) or die "ERROR: move($opath -> $OUT) failed: $!\n";
 
 # Best-effort cleanup of the staging temp file in TMPDIR
 unlink $tpath;

@@ -4,6 +4,7 @@ use warnings;
 
 use LWP::UserAgent;
 use Time::Local;
+use File::Copy qw(move);
 
 my $URL = 'https://www.ng3k.com/Misc/adxo.html';
 my $OUT = '/opt/hamclock-backend/htdocs/ham/HamClock/dxpeds/dxpeditions.txt';
@@ -96,5 +97,5 @@ for my $r (sort { $a->{start} <=> $b->{start} } @records) {
 }
 
 close $fh;
-rename $TMP, $OUT or die "rename failed\n";
+move $TMP, $OUT or die "move failed\n";
 
