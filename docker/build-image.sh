@@ -26,6 +26,14 @@ cd $HERE
 
 RETVAL=0
 
+usage() {
+    cat<<EOF
+$THIS: 
+    -c: build compose only
+    -p <port>: set the http port
+EOF
+}
+
 main() {
 
     while getopts ":p:ch" opt; do
@@ -35,6 +43,10 @@ main() {
                 ;;
             p)
                 HTTP_PORT="$OPTARG"
+                ;;
+            h)
+                usage
+                exit 0
                 ;;
             \?) # Handle invalid options
                 echo "Invalid option: -$OPTARG" >&2
