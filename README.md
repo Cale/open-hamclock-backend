@@ -77,6 +77,9 @@ chmod +x ./install_ohb.sh
 sudo ./install_ohb.sh --sizes "660x330,1320x660,1980x990"
 ```
 ### Option B: Repeat --size
+> [!WARNING]
+> Attempting to image generate multiple sizes or 4K UHD sizes on Pi3B can cause it to overheat!
+
 ```bash
 chmod +x ./install_ohb.sh
 sudo ./install_ohb.sh --size 660x330 --size 1320x660 --size 1980x990
