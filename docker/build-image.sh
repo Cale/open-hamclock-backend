@@ -107,8 +107,7 @@ make_docker_compose() {
 warn_image_tag() {
     if $(docker image list --format '{{.Repository}}:{{.Tag}}' | grep -qs $IMAGE) && [ $TAG != latest ]; then
         echo "The docker image for '$IMAGE' already exists. Please remove it if you want to rebuild."
-        # NOT ENFORCING THIS YET
-        #exit 2
+        exit 2
     fi
 }
 
