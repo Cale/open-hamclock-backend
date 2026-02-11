@@ -25,5 +25,6 @@ python3-grib
 python3-matplotlib
 python3-numpy
 python3-pyproj
+python3-requests
 
 # dependencies pulled in by hamclock-backend package list
