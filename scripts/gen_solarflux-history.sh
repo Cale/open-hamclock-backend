@@ -17,7 +17,7 @@ URL="https://www.spaceweather.gc.ca/solar_flux_data/daily_flux_values/fluxtable.
 # forward data is added just one month at a time
 if [ ! -e "OUTPUT" ]; then
     cp $SEED_FILE $OUTPUT
-    curl -s "$URL" | awk -v lastyear="$LAST_YEAR_SEED" '
+    curl -s "$URL" | awk -v lastyear="$LAST_YEAR_SEED" -v target="$TARGET_MONTH" '
         # 1. Skip lines that are empty or contain headers (starting with # or non-numeric)
         # The data lines usually start with a Julian Date (large number).
         /^[[:space:]]*[0-9]/ {
@@ -28,10 +28,11 @@ if [ ! -e "OUTPUT" ]; then
             
             year  = substr($1, 1, 4)
             month = substr($1, 5, 2)
+            yearmonth = substr($1, 1, 6)
             flux = $5
             
             # Only process if flux is a valid positive number
-            if (flux > 0 && year > lastyear ) {
+            if (flux > 0 && year > lastyear && yearmonth <= target ) {
                 key = year + ((month - 1) / 12)
                 sum[key] += flux
                 count[key]++
