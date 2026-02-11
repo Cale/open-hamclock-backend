@@ -180,8 +180,6 @@ fi
 
 sudo chown -R www-data:www-data "$BASE"
 
-
-
 # Make Perl CGI scripts executable for lighttpd/mod_cgi
 sudo find "$BASE/htdocs/ham/HamClock" -maxdepth 1 -type f -name '*.pl' -exec chmod 755 {} \;
 
@@ -240,7 +238,21 @@ STEP=$((STEP+1)); progress $STEP $STEPS
 echo -e "${BLU}==> Configuring lighttpd${NC}"
 
 sudo ln -sf "$BASE/50-hamclock.conf" /etc/lighttpd/conf-enabled/50-hamclock.conf
-sudo lighttpd-enable-mod cgi
+sudo lighttpd -t -f /etc/lighttpd/lighttpd.conf
+
+# Enable CGI module; some distros return non-zero when it's already enabled
+out="$(sudo lighttpd-enable-mod cgi 2>&1)" || rc=$?
+if [[ ${rc:-0} -ne 0 ]]; then
+  if echo "$out" | grep -qi 'already enabled'; then
+    echo "$out"
+  else
+    echo "$out" >&2
+    exit "${rc:-1}"
+  fi
+else
+  echo "$out"
+fi
+
 sudo lighttpd -t -f /etc/lighttpd/lighttpd.conf
 sudo systemctl daemon-reload
 sudo systemctl restart lighttpd
@@ -342,6 +354,9 @@ run_perl genxray.pl
 VERSION=$(git -C "$BASE" describe --tags --dirty --always 2>/dev/null || echo "unknown")
 HOST=$(hostname)
 IP=$(hostname -I | awk '{print $1}')
+
+echo -e "${BLU}==>Integration test. You should see HTTP 200 and version 4.22${NC}"
+curl -i http://localhost/ham/HamClock/version.pl
 
 echo
 echo -e "${GRN}===========================================${NC}"
