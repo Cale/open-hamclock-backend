@@ -349,6 +349,7 @@ run_perl gen_onta.pl
 run_sh  bzgen.sh
 run_sh  gen_drap.sh
 run_perl genxray.pl
+run_sh  update_muf_rt_maps.sh
 
 # ---------- footer ----------
 VERSION=$(git -C "$BASE" describe --tags --dirty --always 2>/dev/null || echo "unknown")
