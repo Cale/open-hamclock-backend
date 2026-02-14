@@ -31,12 +31,18 @@ gmt xyz2grd "$XYZ" -R0/360/-90/90 -I1 -Gaurora_native.nc
 gmt grdsample aurora_native.nc -I0.1 -Gaurora_dense.nc
 gmt grdfilter aurora_dense.nc -Fg4 -D0 -Gaurora.nc
 
+#cat > aurora.cpt <<EOF
+#0   0/0/0       5   0/0/0
+#5   0/120/0     20  0/255/0
+#20  0/255/0     50  255/255/0
+#50  255/255/0  100 255/0/0
+#EOF
 cat > aurora.cpt <<EOF
-0   0/0/0       5   0/0/0
-5   0/120/0     20  0/255/0
-20  0/255/0     50  255/255/0
-50  255/255/0  100 255/0/0
+0    0/0/0     1    0/0/0
+1    0/40/0    20   0/120/0
+20   0/120/0  100   0/255/0
 EOF
+
 
 echo "Rendering maps..."
 
@@ -60,6 +66,8 @@ for SZ in "${SIZES[@]}"; do
   gmt end || { echo "gmt failed for $SZ"; continue; }
 
   convert "$PNG" -resize "${SZ}!" "$PNG_FIXED" || { echo "resize failed for $SZ"; continue; }
+
+  convert "$PNG_FIXED" -flip "$PNG_FIXED"
 
   echo "  -> $PNG_FIXED"
   convert "$PNG_FIXED" \
