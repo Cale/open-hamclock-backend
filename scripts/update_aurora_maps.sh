@@ -49,18 +49,25 @@ echo "Rendering maps..."
 OUTDIR="/opt/hamclock-backend/htdocs/ham/HamClock/maps"
 mkdir -p "$OUTDIR"
 
+for DN in D N; do
+
 for SZ in "${SIZES[@]}"; do
   BASE="$OUTDIR/aurora_${SZ}"
   PNG="${BASE}.png"
   PNG_FIXED="${BASE}_fixed.png"
-  BMP="$OUTDIR/map-D-${SZ}-Aurora.bmp"
-
+  #BMP="$OUTDIR/map-D-${SZ}-Aurora.bmp"
+  BMP="$OUTDIR/map-${DN}-${SZ}-Aurora.bmp"
+  
   W=${SZ%x*}
   H=${SZ#*x}
 
   echo "  -> $PNG"
   gmt begin "$BASE" png
     gmt coast -R0/360/-90/90 -JQ0/${W}p -Gblack -Sblack -A10000
+    # Day white veil (ONLY for D maps)
+    if [[ "$DN" == "D" ]]; then
+     gmt coast -R0/360/-90/90 -JQ0/${W}p -Gwhite -Swhite -A10000 -t85
+    fi
     gmt grdimage aurora.nc -C"$CPT" -Q -n+b -t40
     gmt coast -R0/360/-90/90 -JQ0/${W}p -W0.75p,white -N1/0.5p,white -A10000
   gmt end || { echo "gmt failed for $SZ"; continue; }
@@ -89,7 +96,10 @@ EOF
 
 done
 
+done
+
 rm -f aurora_native.nc aurora_dense.nc aurora.nc aurora.cpt ovation.xyz
+
 
 echo "Done."
 
