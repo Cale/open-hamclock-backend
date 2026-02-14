@@ -85,7 +85,7 @@ Double check your docker version:
 ./manage-ohb-docker.sh check-docker
 ```
 
-Do an install. Note that if you are running it from a git checkout, it will use the git tag or branch name. If you are running it standalone you should provide it the tag you want to install. It defaults to latest:
+Do an install. Note that if you are running it from a git checkout, it will use the git tag or branch name. If you are running it standalone you should provide it the tag you want to install. It defaults to ```latest```:
 
 ```
 ./manage-ohb-docker.sh install -t 1.0
@@ -105,9 +105,9 @@ docker logs -f open-hamclock-backend
 ```
 
 
-## Point you hamclock to your new back end
+## Point your hamclock to your new back end
 
-Go to the project readme and look for information about the '-b' otion to hamclock. This will make your hamclock pull from your OHB.
+Go to the project readme and look for information about the '-b' otion to hamclock. This will make your hamclock pull its data from your OHB.
 
 # Install OHB with your own image
 ## The steps if you want to create your own image
@@ -118,21 +118,13 @@ The build-image.sh utility will create an image for you based on the git branch 
 ./build-image.sh
 ```
 
-# BREAK: README updates in process
 # Upgrades
-Upgrading OHB is easy. Basically run all the steps above again. You don't need to run docker-ohb-setup.sh but it won't hurt if you do.
+Upgrading OHB is easy. Basically run the manager utility with upgrade. Like the install, it will default to the git tag if there is one, or fall back to latest. You should provide the tag you want to upgrade to if the default isn't what you want:
+```
+./manage-ohb-docker.sh upgrade  -t 1.0
+```
 
 The data is persisted in the storage space you created in the first install. It will have the history after you upgrade. If there are new features, possibly those could take a while to populate. It just depends on the feature.
-
-## Are you running the official bleeding edge?
-If you are running the official "latest" image from Docker Hub, i.e., not building it youself, you need to pull the image.
-
-Docker compose only checks if an image exists locally. It doesn't check to see if an existing image has a newer version at Docker Hub. You have to do so manually.
-```
-docker pull komacke/open-hamclock-backend:latest
-```
-
-If you see it pull updates, then proceed with running the docker compose up command. If there are no updates, don't bother.
 
 # Your hamclock
 Ok, so you have a back end. But does your hamclock know about it? Go to the project readme and look for information about the '-b' otion to hamclock.
