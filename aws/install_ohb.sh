@@ -33,8 +33,6 @@ progress() {
   printf "${BLU}[%-50s] %d%%${NC}\n" "$(printf '#%.0s' $(seq 1 $((pct/2))))" "$pct"
 }
 
-clear
-
 cat <<'EOF'
 
    ██████╗ ██╗  ██╗██████╗
@@ -72,7 +70,7 @@ spinner $!
 sudo apt-get install -y \
 git jq curl perl lighttpd imagemagick \
 libwww-perl libjson-perl libxml-rss-perl libxml-feed-perl libhtml-parser-perl \
-libeccodes-dev libpng-dev libtext-csv-xs-perl librsvg2-bin ffmpeg gmt gmt-gshhg gmt-dcw \
+libeccodes-dev libpng-dev libtext-csv-xs-perl librsvg2-bin ffmpeg ghostscript gmt gmt-gshhg gmt-dcw \
 python3 python3-venv python3-dev python3-requests python3-matplotlib build-essential gfortran gcc make libc6-dev \
 libx11-dev libxaw7-dev libxmu-dev libxt-dev libmotif-dev wget logrotate >/dev/null &
 spinner $!
@@ -194,6 +192,11 @@ sudo mkdir -p \
  "$BASE/data" \
  "$BASE/htdocs/ham/HamClock"
 
+#Fix www-data gmt execution error
+sudo mkdir -p /var/www/.gmt
+sudo chown www-data:www-data /var/www/.gmt
+sudo chmod 755 /var/www/.gmt
+
 # ---------- maps (from GitHub release) ----------
 STEP=$((STEP+1)); progress $STEP $STEPS
 echo -e "${BLU}==> Installing map assets${NC}"
@@ -248,6 +251,19 @@ else
 fi
 
 sudo lighttpd -t -f /etc/lighttpd/lighttpd.conf
+
+# Disable conflicting javascript conf
+sudo lighttpd-disable-mod javascript-alias || true
+if ls /etc/lighttpd/conf-enabled | grep -q javascript; then
+  echo "javascript conf still enabled"
+else
+  echo "javascript conf not present in conf-enabled (expected)"
+fi
+
+sudo lighttpd -tt -f /etc/lighttpd/lighttpd.conf
+sudo systemctl reload lighttpd
+sudo systemctl daemon-reload
+sudo systemctl restart lighttpd
 
 # Enable CGI module; some distros return non-zero when it's already enabled
 out="$(sudo lighttpd-enable-mod cgi 2>&1)" || rc=$?
@@ -311,6 +327,14 @@ seed_spinner() {
   printf "\r${GRN}[✓] Done           ${NC}\n"
 }
 
+run_python() {
+  local f=$1
+  local log="$BASE/logs/${f%.py}.log"
+  echo -e "${YEL}Running python3 $f${NC}"
+  sudo -u www-data env OHB_SIZES="$OHB_SIZES" /usr/bin/python3 "$BASE/scripts/$f" >> "$log" 2>&1 &
+  seed_spinner $!
+}
+
 run_perl() {
   local f=$1
   local log="$BASE/logs/${f%.pl}.log"
@@ -359,11 +383,12 @@ run_sh  gen_noaaswx.sh
 run_sh  update_all_sdo.sh
 run_sh  update_aurora_maps.sh
 run_perl gen_onta.pl
-run_sh  bzgen.sh
+run_python  bz_simple.py
 run_sh  gen_drap.sh
 run_perl genxray.pl
 run_sh  update_muf_rt_maps.sh
 
+sudo chown -R www-data:www-data "$BASE"
 # ---------- footer ----------
 VERSION=$(git -C "$BASE" describe --tags --dirty --always 2>/dev/null || echo "unknown")
 HOST=$(hostname)
