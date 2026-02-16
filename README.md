@@ -245,14 +245,15 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] contests/contests311.txt
 - [x] dxpeds/dxpeditions.txt
 - [x] NOAASpaceWX/noaaswx.txt
-
+- [x] ham/HamClock/cty/cty_wt_mod-ll-dxcc.txt - Country/prefix database with lat/lon
+      
 ### Dynamic Map Files
 Note: Anything under maps/ is considered a "Core Map" in HamClock
 
 - [x] maps/Clouds*
 - [x] maps/Countries*
 - [x] maps/Wx-mB*
-- [ ] maps/Aurora
+- [x] maps/Aurora
 - [x] maps/DRAP
 - [x] maps/MUF-RT
 - [x] maps/Terrain
@@ -273,7 +274,6 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 
 ### Static Files
 - [x] ham/HamClock/cities2.txt - static city file - no urgency to update this for maybe 5 years or more
-- [x] ham/HamClock/cty/cty_wt_mod-ll-dxcc.txt - Country/prefix database with lat/lon
 - [x] ham/HamClock/NOAASpaceWx/rank2_coeffs.txt
 
 ## Integration Testing Status
@@ -285,8 +285,8 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] MUF-RT map generation, download, and display
 - [x] Weather map generation, download, and display
 - [x] Clouds map generation, download, and display
-- [ ] Aurora map generation, download, and display
-- [ ] Aurora map generation, download, and display
+- [x] Aurora map generation, download, and display
+- [x] Aurora map generation, download, and display
 - [x] Parks on the Air generation, pull and display
 - [x] SSN generation, pull, and display
 - [x] Solar wind generation, pull and display
