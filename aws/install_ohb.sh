@@ -200,7 +200,7 @@ sudo chown root:root /opt/hamclock-backend/logs
 sudo chmod 0755 /opt/hamclock-backend/logs
 
 LOGDIR=/opt/hamclock-backend/logs
-sudo -u www-data /bin/sh -c '
+sudo /bin/sh -c '
   umask 002
   for f in \
     bz_simple.log flux_simple.log gen_aurora.log gen_contest-calendar.log \
