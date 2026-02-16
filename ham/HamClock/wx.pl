@@ -176,7 +176,10 @@ sub open_meteo {
         $wx{wind_speed_mps}   = val($pd->{current}->{wind_speed_10m});
         $wx{wind_dir_name}    = deg_to_cardinal(val($pd->{current}->{wind_direction_10m}));
         $wx{clouds}           = val($pd->{current}->{cloud_cover});
+        $wx{conditions}       = get_wmo_description(val($pd->{current}->{weather_code}));
         $wx{pressure_hPa}     = val($pd->{current}->{pressure_msl});
+    } else {
+        $wx{conditions}       = $p->{reason};
     }
 }
 
@@ -205,4 +208,22 @@ sub approx_timezone_seconds {
 
     # OpenWeatherMap-style offset: hours * 3600
     return $hours * 3600;
+}
+
+sub get_wmo_description {
+    my ($code) = @_;
+
+    return 'Clear'           if $code == 0;
+    return 'Partly Cloudy'   if $code >= 1  && $code <= 3;
+    return 'Hazy/Dusty'      if $code >= 4  && $code <= 9;
+    return 'Foggy'           if $code == 10 || ($code >= 40 && $code <= 49);
+    return 'Drizzle'         if $code >= 50 && $code <= 59;
+    return 'Rain'            if $code >= 60 && $code <= 65;
+    return 'Freezing Rain'   if $code >= 66 && $code <= 67;
+    return 'Snow'            if ($code >= 68 && $code <= 69) || ($code >= 70 && $code <= 79);
+    return 'Rain Showers'    if $code >= 80 && $code <= 82;
+    return 'Snow Showers'    if $code >= 85 && $code <= 86;
+    return 'Thunderstorm'    if $code >= 95 && $code <= 99;
+
+    return 'Unknown Code';
 }
