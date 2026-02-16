@@ -5,6 +5,14 @@ use warnings;
 use HTTP::Tiny;
 use JSON::PP;
 
+my %weather_apis = (
+    'weather.gov'   => {'func' => \&weather_gov, 'attrib' => 'weather.gov'},
+    'open-meteo.com'    => {'func' => \&open_meteo, 'attrib' => 'open-mateo.com'},
+    'openweathermap.org'  => {'func' => \&open_weather, 'attrib' => 'openweathermap.org'},
+);
+my $use_wx_api = 'open-meteo.com';
+#my $use_wx_api = 'weather.gov';
+
 my $UA = HTTP::Tiny->new(
     timeout => 5,
     agent   => "HamClock-NOAA/1.1"
@@ -41,7 +49,7 @@ my %wx = (
     wind_dir_name    => "N",
     clouds           => "",
     conditions       => "",
-    attribution      => "weather.gov",
+    attribution      => $weather_apis{$use_wx_api}->{'attrib'},
     timezone         => 0,
 );
 
@@ -54,6 +62,46 @@ if (defined $lat && defined $lng) {
     $wx{timezone} = approx_timezone_seconds($lng);
 
     # 1) points lookup
+    $weather_apis{$use_wx_api}->{'func'}->($lat, $lng, %wx);
+}
+
+hc_output(%wx);
+
+exit;
+
+# -------------------------
+# Output (HamClock format)
+# -------------------------
+sub hc_output {
+    my ($wx) = @_;
+    print <<'HEADER';
+HTTP/1.0 200 Ok
+Content-Type: text/plain; charset=ISO-8859-1
+Connection: close
+
+HEADER
+
+    print <<"BODY";
+city=$wx{city}
+temperature_c=$wx{temperature_c}
+pressure_hPa=$wx{pressure_hPa}
+pressure_chg=$wx{pressure_chg}
+humidity_percent=$wx{humidity_percent}
+dewpoint=$wx{dewpoint}
+wind_speed_mps=$wx{wind_speed_mps}
+wind_dir_name=$wx{wind_dir_name}
+clouds=$wx{clouds}
+conditions=$wx{conditions}
+attribution=$wx{attribution}
+timezone=$wx{timezone}
+BODY
+}
+
+# -------------------------
+# Alternative weather APIs
+# -------------------------
+sub weather_gov {
+    my ($lat, $lng, $wx) = @_;
     my $p = $UA->get("https://api.weather.gov/points/$lat,$lng");
     if ($p->{success}) {
         my $pd = eval { decode_json($p->{content}) };
@@ -103,27 +151,37 @@ if (defined $lat && defined $lng) {
     }
 }
 
-# -------------------------
-# Output (HamClock format)
-# -------------------------
-print "HTTP/1.0 200 Ok\r\n";
-print "Content-Type: text/plain; charset=ISO-8859-1\r\n";
-print "Connection: close\r\n\r\n";
+sub open_meteo {
+    my ($lat, $lng, $wx) = @_;
+    my $base_url = "https://api.open-meteo.com/v1/forecast";
+    my $get_lat_lng = "?latitude=$lat&longitude=$lng";
+    my $get_params = 
+            "&current=temperature_2m"
+            .",relative_humidity_2m"
+            .",wind_speed_10m"
+            .",wind_direction_10m"
+            .",pressure_msl"
+            .",weather_code"
+            .",dew_point_2m"
+            .",cloud_cover"
+            ;
+    my $get_units ="&wind_speed_unit=ms";
 
-print "city=$wx{city}\n";
-print "temperature_c=$wx{temperature_c}\n";
-print "pressure_hPa=$wx{pressure_hPa}\n";
-print "pressure_chg=$wx{pressure_chg}\n";
-print "humidity_percent=$wx{humidity_percent}\n";
-print "dewpoint=$wx{dewpoint}\n";
-print "wind_speed_mps=$wx{wind_speed_mps}\n";
-print "wind_dir_name=$wx{wind_dir_name}\n";
-print "clouds=$wx{clouds}\n";
-print "conditions=$wx{conditions}\n";
-print "attribution=$wx{attribution}\n";
-print "timezone=$wx{timezone}\n";
-
-exit;
+    my $p = $UA->get($base_url.$get_lat_lng.$get_params.$get_units);
+    if ($p->{success}) {
+        my $pd = eval { decode_json($p->{content}) };
+        $wx{temperature_c}    = val($pd->{current}->{temperature_2m});
+        $wx{humidity_percent} = val($pd->{current}->{relative_humidity_2m});
+        $wx{dewpoint}         = val($pd->{current}->{dew_point_2m});
+        $wx{wind_speed_mps}   = val($pd->{current}->{wind_speed_10m});
+        $wx{wind_dir_name}    = deg_to_cardinal(val($pd->{current}->{wind_direction_10m}));
+        $wx{clouds}           = val($pd->{current}->{cloud_cover});
+        $wx{conditions}       = get_wmo_description(val($pd->{current}->{weather_code}));
+        $wx{pressure_hPa}     = val($pd->{current}->{pressure_msl});
+    } else {
+        $wx{conditions}       = $p->{reason};
+    }
+}
 
 # -------------------------
 # Helpers
@@ -150,4 +208,22 @@ sub approx_timezone_seconds {
 
     # OpenWeatherMap-style offset: hours * 3600
     return $hours * 3600;
+}
+
+sub get_wmo_description {
+    my ($code) = @_;
+
+    return 'Clear'           if $code == 0;
+    return 'Partly Cloudy'   if $code >= 1  && $code <= 3;
+    return 'Hazy/Dusty'      if $code >= 4  && $code <= 9;
+    return 'Foggy'           if $code == 10 || ($code >= 40 && $code <= 49);
+    return 'Drizzle'         if $code >= 50 && $code <= 59;
+    return 'Rain'            if $code >= 60 && $code <= 65;
+    return 'Freezing Rain'   if $code >= 66 && $code <= 67;
+    return 'Snow'            if ($code >= 68 && $code <= 69) || ($code >= 70 && $code <= 79);
+    return 'Rain Showers'    if $code >= 80 && $code <= 82;
+    return 'Snow Showers'    if $code >= 85 && $code <= 86;
+    return 'Thunderstorm'    if $code >= 95 && $code <= 99;
+
+    return 'Unknown Code';
 }
