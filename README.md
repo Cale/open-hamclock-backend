@@ -62,5 +62,5 @@ Current highlights:
 
 👉 Full artifact tracking and integration status:
 [PROJECT_STATUS.md](PROJECT_STATUS.md) 
-# 📚 Data Attribution 👉 [Attribution](ATTRIBUTION.md)
+## 📚 Data Attribution 👉 [Attribution](ATTRIBUTION.md)
 ## 🤝 Contributing
