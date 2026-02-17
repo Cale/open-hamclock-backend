@@ -1,145 +1,60 @@
-# OHB - Open HamClock Backend
-Open Source and Faithful HamClock Backend Replacement. This is a community project and no relation to the creator of HamClock Elwood Downey, WB0OEW, ecdowney@clearskyinstitute.com SK
+# 🛟 OHB — Open HamClock Backend
+Open-source, self-hostable backend replacement for HamClock.
 
-I wish the Downey family my deepest condolences
+When the original backend went dark, the clocks didn’t have to.
 
-This is a WIP.
+OHB provides faithful replacements for the data feeds and map assets
+that HamClock depends on — built by operators, for operators.
 
-## License
-MIT
+> This project is not affiliated with HamClock or its creator,
+> Elwood Downey, WB0OEW.
+> We extend our sincere condolences to the Downey family.
+
+---
+
+## ✨ What OHB Does
+
+- Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc)
+- Generates map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.)
+- Produces zlib-compressed BMP assets in multiple resolutions
+- Designed for Raspberry Pi, cloud, or on-prem deployment
+- Fully open source and community maintained
+
+---
+
+## 🧭 Architecture
+```
+[ NOAA / KC2G / PSK / SWPC ]
+              |
+              v
+        +-------------+
+        |     OHB     |
+        |-------------|
+        | Python/Perl|
+        | GMT/Maps   |
+        | Cron Jobs  |
+        +-------------+
+              |
+           HTTP/ZLIB
+              |
+         +----------+
+         | lighttpd |
+         +----------+
+              |
+         +----------+
+         | HamClock |
+         +----------+
+```
 
 ## Join us on Discord 💬
 We are building a community-powered backend to keep HamClock running. \
 Discord is where we can collaborate, troubleshoot, and exchange ideas — no RF license required 😎 \
 https://discord.gg/wb8ATjVn6M
 
-## Attribution
-- [MUF-RT](https://prop.kc2g.com/) Note: MUF-RT data for this map are from GIRO collected and used by permission from KC2G.
-- [Space Weather Prediction Center](https://www.swpc.noaa.gov/)
-- NASA for [SDO](https://sdo.gsfc.nasa.gov/) and [STEREO](https://stereo.gsfc.nasa.gov/) images
-- National Research Council Canada [10.7 cm solar flux](https://www.spaceweather.gc.ca/forecast-prevision/solar-solaire/solarflux/sx-en.php) data
-- [HamWeekly.com](https://hamweekly.com/)
-- [NG3K.com](https://www.ng3k.com/)
-- [ARNewsline.com](https://www.arnewsline.org/)
-- [PSKReporter](https://pskreporter.info/) by Phillip Gladstone
-- [WSPR Live](https://wspr.live/)
-- [WA7BNM Weekend Contests Calendar](https://www.contestcalendar.com/)
-- [Amateur Radio Country Files](https://www.country-files.com/big-cty/)
-
-## Data sources and attribution
-
-Sunspot numbers published in `ssn-31.txt` are derived from the following public datasets:
-
-1. **NOAA / NWS Space Weather Prediction Center (SWPC) — Daily Solar Data (DSD.txt)**
-   - Source: SWPC Data Service text product **`daily-solar-indices.txt`** (“Last 30 Days Daily Solar Data”).
-   - Use in this project: parses the daily **SESC Sunspot Number** column for historical days.
-   - URL: https://services.swpc.noaa.gov/text/daily-solar-indices.txt
-
-2. **NOAA / NWS Space Weather Prediction Center (SWPC) — Solar-cycle JSON**
-   - Source: SWPC Data Service JSON **`swpc_observed_ssn.json`**.
-   - Use in this project: uses **`swpc_ssn`** for the **current UTC day** (when present), to avoid the common 1-day lag in the “Last 30 Days” text product.
-   - URL: https://services.swpc.noaa.gov/json/solar-cycle/swpc_observed_ssn.json
-
-3. **SILSO (Royal Observatory of Belgium / SIDC) — Estimated International Sunspot Number (EISN)**
-   - Source: **`EISN_current.txt`** (plain ASCII fixed-width format).
-   - Use in this project: **fallback only** for the **current UTC day** if SWPC solar-cycle JSON does not yet include today’s value.
-   - URL: https://sidc.be/SILSO/DATA/EISN/EISN_current.txt
-
-### Notes
-- “Today” is determined using **UTC**.
-- All data remain the property of their respective providers; this project redistributes derived values and does not claim ownership of the underlying observations or indices.
-
-## Vision
-The goal is to make this as a drop-in replacement for the HamClock backend by replicating the same client/server responses with Perl CGI scripting and static files. We don't have access to the backend server source code so this is completely created by looking at the interfaces. The goal is to allow for local or central install of OHB to keep all existing HamClock's from working beyond June 2026
-
-## Interoperability
-This project generates map and data artifacts in the same formats expected by the HamClock client (e.g. zlib compressed BMP RGB565 map tiles) to support interoperability. This project is not affiliated with or endorsed by the original HamClock project or any third party. Data products are derived from public upstream sources such as NOAA SWPC and NASA
-
-## Known Issues
-[Active Issues](https://github.com/BrianWilkinsFL/open-hamclock-backend/issues)
-
-- Satellite planning page will cause HamClock to fail. Error message refers to a SatTool name lookup issue. This seems to only happen if two satellites are not selected by the user. To the best of our knowledge, this is a HamClock bug
-- IP Geolocation will not work if API key not set. To fix, set API key in fetchIPGeoloc.pl
-- One or more SDO images may report 'File is not BMP'. If this is the case, try switching to a different image temporarily
-  
-# Importance of Accurate and Consistent Time
-This is worth documenting explicitly. Your backend now depends on monotonic, synchronized time. Without it, feeds appear “broken” even when structurally correct.
-
-## Time Synchronization Requirements
-
-Open HamClock Backend (OHB) and all HamClock clients must maintain accurate and synchronized system time.
-
-OHB generates time-series data (aurora, solar wind, DRAP, SSN, etc.) using Unix epoch timestamps. HamClock clients compute data age using:
-
-```age = now_client - epoch_from_backend```
-
-If the client clock is incorrect or significantly out of sync with the backend, HamClock will discard valid data and log errors such as:
-
-AURORA: skipping age -491926 hrs
-AURORA: only 0 points
-
-Negative ages indicate the client believes the data is from the future.
-
-## Required Conditions
-
-* Backend system clock must be accurate (UTC)
-* HamClock client clock must be accurate (UTC)
-* Clock skew between backend and clients should be less than a few seconds
-
-Even multi-minute skew can distort plotted slopes
-Large skew (hours/days/years) will cause complete data rejection
-
-## Enabling Time Sync (Linux / Raspberry Pi)
-
-Verify status:
-
-```timedatectl```
-
-Enable NTP synchronization:
-
-```sudo timedatectl set-ntp true```
-```sudo systemctl restart systemd-timesyncd```
-
-If systemd-timesyncd is not available:
-
-```sudo apt install ntp```
-```sudo systemctl enable ntp```
-```sudo systemctl start ntp```
-
-Confirm synchronization:
-
-```timedatectl```
-
-You should see:
-
-```System clock synchronized: yes```
-
-## Why This Matters
-
-* OHB uses deterministic epoch flooring (30-minute cadence)
-* HamClock assumes evenly spaced historical bins
-
-Time drift breaks these assumptions.
-
-Symptoms of clock problems include:
-
-* Aurora graph shows no data
-* “skipping age” messagesFlatlined plots
-* Sudden apparent time gaps
-
-These are almost always clock skew issues — not backend failures
-
-OHB does not compensate for client clock drift by design
-
-## Compatibility
-- [x] Ubuntu 22.x LTS (Baremetal, VM, or WSL)
-- [x] Ubuntu 24 AWS AMI (Baremetal, VM, or WSL)
-- [x] Debian 13.3 
-- [x] Raspberry Pi 3b+, 4, and 5
-     - [x] Tested Trixie 64 bit OS on Pi 3b+ with image sizes 660x330, 1320x660
-           - 2640x1320 for MUF-RT does not currently work
-- [x] Inovato Quadra
-- [ ] Mac 
+## 🚀 Quick Start  
+## 📦 Installation  
+## 🛠 Usage Examples  
+## 🤝 Contributing
 
 ## Install:
 (NOTE: to run OHB in docker, visit https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/docker/README.md)
