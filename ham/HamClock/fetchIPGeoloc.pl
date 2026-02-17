@@ -6,7 +6,7 @@ use LWP::UserAgent;
 use JSON qw(decode_json);
 
 # ================= CONFIG =================
-my $API_KEY = '<YOUR FREE IPGEO API KEY HERE>';
+my $API_KEY = $ENV{'IPGEOLOC_API_KEY'} // "",
 my $API_URL = 'https://api.ipgeolocation.io/ipgeo';
 # ==========================================
 

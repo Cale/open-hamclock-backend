@@ -89,7 +89,8 @@ Double check your docker version:
 Do an install. Note that if you are running it from a git checkout, it will use the git tag or branch name. If you are running it standalone you should provide it the tag you want to install. It defaults to ```latest```:
 
 ```
-./manage-ohb-docker.sh install -t v1.0
+# put in the version you want or set to latest
+./manage-ohb-docker.sh install -t <insert version here>
 ```
 
 When the script is done, you should have a running install of OHB! Try this:
@@ -123,13 +124,36 @@ The build-image.sh utility will create an image for you based on the git branch 
 # Upgrades
 Upgrading OHB is easy. Basically run the manager utility with upgrade. Like the install, it will default to the git tag if there is one, or fall back to latest. You should provide the tag you want to upgrade to if the default isn't what you want:
 ```
-./manage-ohb-docker.sh upgrade -t v1.0
+# put in the version you want or set to latest
+./manage-ohb-docker.sh upgrade -t <insert version here>
 ```
 
 The data is persisted in the storage space you created in the first install. It will have the history after you upgrade. If there are new features, possibly those could take a while to populate. It just depends on the feature.
 
 # Your hamclock
 Ok, so you have a back end. But does your hamclock know about it? Go to the project readme and look for information about the '-b' otion to hamclock.
+
+
+# API Keys
+Two services require API keys: openweathermaps.com and ipgeolocation.io.
+
+If openweathermaps doesn't get a key, HamClock will fall back to open-meteo.com. If ipgeolocation.io doesn't have a key, installinga new HamCLock won't be able to pull up your location. Not the end of the world.
+
+If you have these keys, you can provide them to OHB by putting them into a file named ```.env``` and formatting the contents like this:
+```
+# for the api.openweathermap.org API
+OPEN_WEATHER_API_KEY=<insert key here>
+
+# for the app.ipgeolocation.io API
+IPGEOLOC_API_KEY=<insert key here>
+```
+Replace \<insert key here\> with your respective key.
+
+Upon a fresh install or upgrade, the file will be used automatically. To add the keys to an existing install use the add-env-file command:
+```
+./manage-ohb-docker.sh add-env-file
+./manage-ohb-docker.sh restart
+```
 
 
 
