@@ -123,20 +123,28 @@ spinner $!
 STEP=$((STEP+1)); progress $STEP $STEPS
 echo -e "${BLU}==> Configuring ImageMagick policy for large maps${NC}"
 
-POLICY="/etc/ImageMagick-6/policy.xml"
-
-if [[ ! -f "$POLICY" ]]; then
-  echo -e "${YEL}WARN: ImageMagick policy not found at $POLICY — skipping${NC}"
+# Support both ImageMagick 6 and 7
+if [[ -f /etc/ImageMagick-7/policy.xml ]]; then
+  POLICY="/etc/ImageMagick-7/policy.xml"
+elif [[ -f /etc/ImageMagick-6/policy.xml ]]; then
+  POLICY="/etc/ImageMagick-6/policy.xml"
 else
+  POLICY=""
+fi
+
+if [[ -z "$POLICY" ]]; then
+  echo -e "${YEL}WARN: ImageMagick policy not found — skipping${NC}"
+else
+  echo -e "${BLU}    Using: $POLICY${NC}"
   _im_ok=1
-  sudo sed -i 's/name="width" value="[^"]*"/name="width" value="16KP"/' "$POLICY"   || _im_ok=0
+  sudo sed -i 's/name="width" value="[^"]*"/name="width" value="16KP"/'   "$POLICY" || _im_ok=0
   sudo sed -i 's/name="height" value="[^"]*"/name="height" value="16KP"/' "$POLICY" || _im_ok=0
-  sudo sed -i 's/name="area" value="[^"]*"/name="area" value="128MP"/' "$POLICY"    || _im_ok=0
-  sudo sed -i 's/name="disk" value="[^"]*"/name="disk" value="8GiB"/' "$POLICY"     || _im_ok=0
+  sudo sed -i 's/name="area" value="[^"]*"/name="area" value="128MP"/'    "$POLICY" || _im_ok=0
+  sudo sed -i 's/name="disk" value="[^"]*"/name="disk" value="8GiB"/'     "$POLICY" || _im_ok=0
   sudo sed -i 's/name="memory" value="[^"]*"/name="memory" value="2GiB"/' "$POLICY" || _im_ok=0
 
   if [[ "$_im_ok" -eq 1 ]]; then
-    echo -e "${GRN}[✓] ImageMagick policy updated${NC}"
+    echo -e "${GRN}[✓] ImageMagick policy updated ($POLICY)${NC}"
   else
     echo -e "${YEL}WARN: ImageMagick policy update partially failed — large maps may not render correctly${NC}"
     echo -e "${YEL}      Fix manually: sudo nano $POLICY${NC}"
