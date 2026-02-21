@@ -119,7 +119,6 @@ python3 python3-venv python3-dev python3-requests python3-matplotlib build-essen
 libx11-dev libxaw7-dev libxmu-dev libxt-dev libmotif-dev wget logrotate xmlstarlet >/dev/null &
 spinner $!
 
-# ---------- imagemagick policy ----------
 STEP=$((STEP+1)); progress $STEP $STEPS
 echo -e "${BLU}==> Configuring ImageMagick policy for large maps${NC}"
 
@@ -130,20 +129,44 @@ if [[ -z "$POLICY" ]]; then
   echo -e "${YEL}WARN: ImageMagick policy not found — skipping${NC}"
 else
   echo -e "${BLU}    Using: $POLICY${NC}"
-  _im_ok=1
-  sudo xmlstarlet ed -L \
-    -u "//policy[@domain='resource'][@name='width']/@value"  -v "16KP" \
-    -u "//policy[@domain='resource'][@name='height']/@value" -v "16KP" \
-    -u "//policy[@domain='resource'][@name='area']/@value"   -v "128MP" \
-    -u "//policy[@domain='resource'][@name='disk']/@value"   -v "8GiB" \
-    -u "//policy[@domain='resource'][@name='memory']/@value" -v "2GiB" \
-    "$POLICY" || _im_ok=0
 
-  if [[ "$_im_ok" -eq 1 ]]; then
-    echo -e "${GRN}[✓] ImageMagick policy updated ($POLICY)${NC}"
+  # Backup original before any modifications
+  POLICY_BAK="${POLICY}.ohb.bak"
+  if [[ ! -f "$POLICY_BAK" ]]; then
+    sudo cp "$POLICY" "$POLICY_BAK"
+    echo -e "${BLU}    Backup: $POLICY_BAK${NC}"
   else
-    echo -e "${YEL}WARN: ImageMagick policy update failed — large maps may not render correctly${NC}"
-    echo -e "${YEL}      Fix manually: sudo nano $POLICY${NC}"
+    echo -e "${BLU}    Backup already exists: $POLICY_BAK (skipping)${NC}"
+  fi
+
+  # Sanitize invalid double-hyphens inside XML comments before xmlstarlet runs.
+  # Debian/Ubuntu ships policy.xml with <!-- ... -- ... --> which is illegal XML.
+  # Strategy: replace any '--' that is NOT immediately followed by '>' with a single '-'.
+  sudo perl -i -pe 's/<!--.*?-->/my $c=$&; $c=~s|(?<!-)--(?!>)|-|g; $c/gse' "$POLICY" 2>/dev/null || \
+    sudo sed -i -E ':a;s/(<!--[^-]*)--([^>])/\1-\2/;ta' "$POLICY"
+
+  # Validate before proceeding
+  if ! xmlstarlet val "$POLICY" &>/dev/null; then
+    echo -e "${YEL}WARN: $POLICY is not valid XML even after sanitization — skipping${NC}"
+    echo -e "${YEL}      Original preserved at: $POLICY_BAK${NC}"
+  else
+    _im_ok=1
+    sudo xmlstarlet ed -L \
+      -u "//policy[@domain='resource'][@name='width']/@value"  -v "16KP" \
+      -u "//policy[@domain='resource'][@name='height']/@value" -v "16KP" \
+      -u "//policy[@domain='resource'][@name='area']/@value"   -v "128MP" \
+      -u "//policy[@domain='resource'][@name='disk']/@value"   -v "8GiB" \
+      -u "//policy[@domain='resource'][@name='memory']/@value" -v "2GiB" \
+      "$POLICY" || _im_ok=0
+
+    if [[ "$_im_ok" -eq 1 ]]; then
+      echo -e "${GRN}[✓] ImageMagick policy updated ($POLICY)${NC}"
+      echo -e "${GRN}    Original backed up at: $POLICY_BAK${NC}"
+    else
+      echo -e "${YEL}WARN: ImageMagick policy update failed — large maps may not render correctly${NC}"
+      echo -e "${YEL}      Fix manually: sudo nano $POLICY${NC}"
+      echo -e "${YEL}      Restore original: sudo cp $POLICY_BAK $POLICY${NC}"
+    fi
   fi
 fi
 
