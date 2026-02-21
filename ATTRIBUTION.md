@@ -10,4 +10,9 @@
 - [WSPR Live](https://wspr.live/)
 - [WA7BNM Weekend Contests Calendar](https://www.contestcalendar.com/)
 - [Amateur Radio Country Files](https://www.country-files.com/big-cty/)
+- [Parks on the Air](https://api.pota.app/spot)
+- [Parks 'N Peaks](https://parksnpeaks.org/api/ALL)
+- [CQGMA](https://www.cqgma.org/api/spots/wwff/)
+- [NOAA NOMADS](https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl)
+- [ World Data Center for Geomagnetism, Kyoto](https://wdc.kugi.kyoto-u.ac.jp)
 - [Python port of DVOACAP HF propagation prediction engine](https://github.com/skyelaird/dvoacap-python/) by Joel Morin - VE1ATM
