@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
 """
-solarflux_99_swpc.py
+flux_simple.py
 
 Reconstruct ClearSky-like solarflux-99 generation without ClearSky availability.
 
-Inputs:
-- SWPC daily-solar-indices.txt: last ~30 days daily solar indices, including 10.7 cm flux
-- SWPC wwv.txt: daily solar flux value in prose, used to patch the newest day if newer than DSD
+Observed:
+- SWPC daily-solar-indices.txt
+- SWPC wwv.txt (patch newest day)
+
+Forecast:
+- SWPC 27-day-outlook.txt (next days, smoothed Elwood-style)
 
 Algorithm:
-- Build/maintain a rolling cache of daily values (YYYYMMDD -> int flux)
-- Select last 33 daily values (pad-left with oldest if fewer)
-- Expand each day to 3 samples (repeat 3x) => 99 values
-- Write 99 integers, one per line, to:
-  /opt/hamclock-backend/htdocs/ham/HamClock/solar-flux/solarflux-99.txt
-
-Cache:
-  /opt/hamclock-backend/data/solarflux-swpc-cache.txt
+- Maintain rolling cache of daily values (YYYYMMDD -> int flux)
+- Inject 2 forecast days using adjacent means
+- Keep last 33 days
+- Expand each day to 3 samples => 99 values
 """
 
 from __future__ import annotations
@@ -32,6 +31,7 @@ import requests
 
 URL_DSD = "https://services.swpc.noaa.gov/text/daily-solar-indices.txt"
 URL_WWV = "https://services.swpc.noaa.gov/text/wwv.txt"
+URL_OUTLOOK = "https://services.swpc.noaa.gov/text/27-day-outlook.txt"
 
 CACHE_PATH = "/opt/hamclock-backend/data/solarflux-swpc-cache.txt"
 OUT_PATH = "/opt/hamclock-backend/htdocs/ham/HamClock/solar-flux/solarflux-99.txt"
@@ -57,185 +57,164 @@ def atomic_write(path: str, content: str) -> None:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
             f.write(content)
         os.replace(tmp, path)
-    except Exception:
+    finally:
         try:
             os.unlink(tmp)
         except OSError:
             pass
-        raise
 
 
 def load_cache(path: str) -> Dict[str, int]:
-    out: Dict[str, int] = {}
+    out = {}
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split()
-                if len(parts) != 2:
-                    continue
-                ymd, v = parts
-                if not re.fullmatch(r"\d{8}", ymd):
-                    continue
-                try:
-                    out[ymd] = int(v)
-                except ValueError:
-                    continue
+        with open(path) as f:
+            for l in f:
+                p = l.split()
+                if len(p) == 2 and re.fullmatch(r"\d{8}", p[0]):
+                    out[p[0]] = int(p[1])
     except FileNotFoundError:
         pass
     return out
 
 
-def save_cache(path: str, cache: Dict[str, int], keep_days: int = 180) -> None:
-    keys = sorted(cache.keys())
-    if len(keys) > keep_days:
-        for k in keys[:-keep_days]:
-            cache.pop(k, None)
-    content = "".join(f"{k} {cache[k]}\n" for k in sorted(cache.keys()))
-    atomic_write(path, content)
+def save_cache(path: str, cache: Dict[str, int]):
+    atomic_write(path, "".join(f"{k} {cache[k]}\n" for k in sorted(cache)))
 
 
-def parse_dsd(text: str) -> Dict[str, int]:
-    """
-    Parse SWPC daily-solar-indices.txt lines that look like:
-      YYYY MM DD  <10.7cm> ...
-
-    We take the 4th token (10.7 cm flux).
-    """
-    daily: Dict[str, int] = {}
-    for line in text.splitlines():
-        if not line or line.startswith(("#", ":")):
-            continue
-        if not re.match(r"^\s*\d{4}\s+\d{1,2}\s+\d{1,2}\s+", line):
-            continue
-        parts = line.split()
-        if len(parts) < 4:
-            continue
-        y, m, d = int(parts[0]), int(parts[1]), int(parts[2])
-        flux_str = parts[3]
-        ymd = f"{y:04d}{m:02d}{d:02d}"
-        try:
-            v = int(float(flux_str))  # truncate
-        except ValueError:
-            continue
-        daily[ymd] = v
-    return daily
-
-
-def parse_wwv(text: str) -> Optional[Tuple[str, int]]:
-    """
-    Extract:
-      Solar-terrestrial indices for <D> <Month> follow.
-      Solar flux <N> and ...
-
-    Year is taken from :Issued: line.
-    """
-    issued_year = None
-    for line in text.splitlines():
-        if line.startswith(":Issued:"):
-            m = re.search(r":Issued:\s+(\d{4})\s+", line)
-            if m:
-                issued_year = int(m.group(1))
-            break
-    if issued_year is None:
-        return None
-
-    idx_date = None
-    for line in text.splitlines():
-        m = re.search(r"Solar-terrestrial indices for\s+(\d{1,2})\s+([A-Za-z]+)\s+follow\.", line)
-        if m:
-            day = int(m.group(1))
-            mon = m.group(2)
-            # Month might be full or abbreviated; try both.
-            for fmt in ("%Y %B %d", "%Y %b %d"):
-                try:
-                    dt = datetime.strptime(f"{issued_year} {mon} {day}", fmt)
-                    idx_date = dt.strftime("%Y%m%d")
-                    break
-                except ValueError:
-                    continue
-            break
-    if idx_date is None:
-        return None
-
-    for line in text.splitlines():
-        m = re.search(r"\bSolar flux\s+(\d+)\b", line)
-        if m:
-            return idx_date, int(m.group(1))
-
-    return None
-
-
-def build_99(cache: Dict[str, int]) -> List[int]:
-    keys = sorted(cache.keys())
-    if not keys:
-        raise ValueError("no cached daily values")
-
-    vals = [cache[k] for k in keys]
-
-    # last 33 days, pad-left if needed
-    if len(vals) >= DAYS:
-        vals = vals[-DAYS:]
-    else:
-        pad = vals[0]
-        vals = [pad] * (DAYS - len(vals)) + vals
-
-    out: List[int] = []
-    for v in vals:
-        out.extend([int(v)] * REPEAT)
-
-    if len(out) != TOTAL:
-        raise ValueError(f"internal: produced {len(out)} values, expected {TOTAL}")
+def parse_dsd(txt: str) -> Dict[str, int]:
+    out = {}
+    for l in txt.splitlines():
+        if re.match(r"\s*\d{4}\s+\d+\s+\d+", l):
+            p = l.split()
+            ymd = f"{int(p[0]):04d}{int(p[1]):02d}{int(p[2]):02d}"
+            out[ymd] = int(float(p[3]))
     return out
 
 
-def main() -> int:
+def parse_wwv(txt: str) -> Optional[Tuple[str, int]]:
+    yr = None
+    for l in txt.splitlines():
+        if l.startswith(":Issued:"):
+            m = re.search(r"(\d{4})", l)
+            if m:
+                yr = int(m.group(1))
+            break
+    if not yr:
+        return None
+
+    day = mon = None
+    for l in txt.splitlines():
+        m = re.search(r"indices for\s+(\d+)\s+([A-Za-z]+)", l)
+        if m:
+            day = int(m.group(1))
+            mon = m.group(2)
+            break
+
+    if not day:
+        return None
+
+    dt = datetime.strptime(f"{yr} {mon} {day}", "%Y %b %d").strftime("%Y%m%d")
+
+    for l in txt.splitlines():
+        m = re.search(r"Solar flux\s+(\d+)", l)
+        if m:
+            return dt, int(m.group(1))
+
+    return None
+
+def parse_outlook(txt: str) -> Dict[str, int]:
+    """
+    Parse NOAA 27-day outlook table (27DO.txt style).
+
+    Lines look like:
+    2026 Feb 22     120           5          2
+    """
+
+    out = {}
+
+    for l in txt.splitlines():
+        l = l.strip()
+        if not l:
+            continue
+
+        parts = l.split()
+        if len(parts) >= 4 and parts[0].isdigit():
+            try:
+                y = parts[0]
+                mon = parts[1]
+                d = parts[2]
+                flux = parts[3]
+
+                dt = datetime.strptime(f"{y} {mon} {d}", "%Y %b %d")
+                out[dt.strftime("%Y%m%d")] = int(flux)
+            except Exception:
+                continue
+
+    return out
+
+def build_99(cache: Dict[str, int]) -> List[int]:
+    vals = [cache[k] for k in sorted(cache)]
+    if len(vals) < DAYS:
+        vals = [vals[0]] * (DAYS - len(vals)) + vals
+    vals = vals[-DAYS:]
+
+    out = []
+    for v in vals:
+        out += [v] * REPEAT
+
+    if len(out) != TOTAL:
+        raise ValueError("internal length mismatch")
+
+    return out
+
+
+def main():
+    first = not os.path.exists(CACHE_PATH)
     cache = load_cache(CACHE_PATH)
 
-    try:
-        dsd_txt = fetch_text(URL_DSD)
-        dsd = parse_dsd(dsd_txt)
-        if not dsd:
-            raise ValueError("parsed 0 daily values from DSD")
-        cache.update(dsd)
-    except Exception as e:
-        print(f"ERROR: failed to ingest daily-solar-indices.txt: {e}", file=sys.stderr)
-        return 2
+    dsd = parse_dsd(fetch_text(URL_DSD))
+    for k, v in dsd.items():
+        if k not in cache:
+            cache[k] = v
 
-    # WWV patch if newer than newest DSD day
     try:
-        wwv_txt = fetch_text(URL_WWV)
-        wwv = parse_wwv(wwv_txt)
+        wwv = parse_wwv(fetch_text(URL_WWV))
         if wwv:
-            wwv_date, wwv_flux = wwv
-            newest_dsd = max(dsd.keys())
-            if wwv_date >= newest_dsd:
-                cache[wwv_date] = wwv_flux
+            d, f = wwv
+            if d >= max(cache):
+                cache[d] = f
     except Exception:
-        # Non-fatal: DSD is primary
         pass
 
-    # persist cache
+    # ---- Elwood smoothing via NOAA outlook ----
     try:
-        save_cache(CACHE_PATH, cache, keep_days=180)
-    except Exception as e:
-        print(f"ERROR: failed to write cache: {e}", file=sys.stderr)
-        return 3
+        outlook = parse_outlook(fetch_text(URL_OUTLOOK))
 
-    # build and write 99
-    try:
-        out = build_99(cache)
-        content = "\n".join(map(str, out)) + "\n"
-        atomic_write(OUT_PATH, content)
-    except Exception as e:
-        print(f"ERROR: failed to build/write 99: {e}", file=sys.stderr)
-        return 4
+        last = max(cache)
+        fkeys = sorted(k for k in outlook if k > last)
+        
+        if len(fkeys) >= 2:
+            o = cache[last]
+            f1 = outlook[fkeys[0]]
+            f2 = outlook[fkeys[1]]
+            cache[fkeys[0]] = round((o + f1) / 2)
+            cache[fkeys[1]] = round((f1 + f2) / 2)
+    except Exception:
+        pass
 
-    return 0
+    if first and cache:
+        cache.pop(sorted(cache)[0])
+
+    keys = sorted(cache)
+    if len(keys) > DAYS:
+        for k in keys[:-DAYS]:
+            cache.pop(k)
+
+    save_cache(CACHE_PATH, cache)
+
+    out = build_99(cache)
+    atomic_write(OUT_PATH, "\n".join(map(str, out)) + "\n")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
-
+    main()
