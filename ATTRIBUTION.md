@@ -16,3 +16,5 @@
 - [NOAA NOMADS](https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl)
 - [ World Data Center for Geomagnetism, Kyoto](https://wdc.kugi.kyoto-u.ac.jp)
 - [Python port of DVOACAP HF propagation prediction engine](https://github.com/skyelaird/dvoacap-python/) by Joel Morin - VE1ATM
+- [Celestrak](https://celestrak.org/)
+- [Space Weather Canada](https://www.spaceweather.gc.ca)
