@@ -80,3 +80,7 @@ As of today:
 [PROJECT_STATUS.md](PROJECT_STATUS.md) 
 ## 📚 Data Attribution 👉 [Attribution](ATTRIBUTION.md)
 ## 🤝 Contributing
+## Related
+- [ohb-pskreporter-proxy](https://github.com/BrianWilkinsFL/ohb-pskreporter-proxy)
+- [hamclock-proxy-lite](https://github.com/BrianWilkinsFL/hamclock-proxy-lite)
+- [HamClockLauncher](https://github.com/huberthickman/HamClockLauncher)
