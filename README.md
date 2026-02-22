@@ -4,7 +4,7 @@ When the original backend went dark, the clocks didn’t have to.
 
 Open-source, self-hostable backend replacement for HamClock — restoring live propagation data, maps, and feeds.
 
-What's a backend? It is how HamClock got all of its data. Without a separare backend, all HamClock's will cease to function by June 2026.
+What's a backend? It is how HamClock got all of its data. Without a separate backend, all HamClock's will cease to function by June 2026.
 
 Drop-in compatible with existing HamClock's — no firmware changes required.
 
