@@ -542,6 +542,7 @@ run_perl update_sota_cache.pl
 run_perl update_wwff_cache.pl
 run_perl gen_onta.pl
 run_python  bz_simple.py
+run_python web15rss_fetch.py
 run_sh  gen_drap.sh
 run_python xray_simple.py
 run_sh  kc2g_muf_heatmap.sh
