@@ -80,6 +80,8 @@ As of today:
 [PROJECT_STATUS.md](PROJECT_STATUS.md) 
 ## 📚 Data Attribution 👉 [Attribution](ATTRIBUTION.md)
 ## 🤝 Contributing
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/BrianWilkinsFL/open-hamclock-backend/issues
 ## Related
 - [ohb-pskreporter-proxy](https://github.com/BrianWilkinsFL/ohb-pskreporter-proxy)
 - [hamclock-proxy-lite](https://github.com/BrianWilkinsFL/hamclock-proxy-lite)
