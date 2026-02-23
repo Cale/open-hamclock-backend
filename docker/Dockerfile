@@ -26,6 +26,11 @@ RUN cd /opt/hamclock-backend && \
         htdocs && \
     mv  docker/run.sh /opt && \
     # \
+    # move this and packages into a build \
+    curl -fsSL https://github.com/skyelaird/dvoacap-python/archive/refs/heads/main.tar.gz | tar -xz && \
+    pip install dvoacap-python-main/. --break-system-packages && \
+    rm -Rf dvoacap-python-main && \
+    # \
     # cron is tightly coupled to the type of python install. cron is written for pyenv. however \
     # when there is no pip or pyenv, python runs from /usr. \
     sed -i 's|^VENV=.*|VENV=/usr|' scripts/crontab && \

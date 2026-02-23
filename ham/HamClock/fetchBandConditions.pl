@@ -8,7 +8,10 @@ use CGI qw(:standard);
 # Delegates to voacap_bandconditions.py and returns identical output.
 # ---------------------------------------------------------------------------
 
-my $PYTHON  = '/opt/hamclock-backend/venv/bin/python3';
+my $PYTHON = '/opt/hamclock-backend/venv/bin/python3';
+if (! -e $PYTHON || ! -x $PYTHON) {
+	$PYTHON = '/usr/bin/python3';
+}
 my $SCRIPT  = '/opt/hamclock-backend/scripts/voacap_bandconditions.py';
 my $CACHE_DIR = '/opt/hamclock-backend/tmp/voacap-cache';
 my $CACHE_TTL = 300;   # seconds; set 0 to disable
