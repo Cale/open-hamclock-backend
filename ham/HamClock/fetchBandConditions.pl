@@ -10,8 +10,6 @@ use CGI qw(:standard);
 
 my $PYTHON  = '/opt/hamclock-backend/venv/bin/python3';
 my $SCRIPT  = '/opt/hamclock-backend/scripts/voacap_bandconditions.py';
-my $CACHE_DIR = '/opt/hamclock-backend/tmp/voacap-cache';
-my $CACHE_TTL = 300;   # seconds; set 0 to disable
 
 # ---------------------------------------------------------------------------
 # Parse query string parameters
@@ -93,8 +91,6 @@ my @cmd = (
     '--mode',   $mode,
     '--toa',    $toa,
     '--ssn',    $ssn,
-    '--cache-dir', $CACHE_DIR,
-    '--cache-ttl', $CACHE_TTL,
 );
 
 
