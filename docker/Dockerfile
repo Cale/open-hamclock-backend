@@ -84,6 +84,7 @@ RUN cd /opt/hamclock-backend && \
     /usr/sbin/lighty-enable-mod accesslog && \
     /usr/sbin/lighttpd-enable-mod hamclock && \
     /usr/sbin/lighttpd-enable-mod ohb-dashboard && \
+    /usr/sbin/lighttpd-enable-mod voacap-proxy && \
     # \
     # ImageMagick policy parameters need to be increased \
     sed -i 's/name="memory" value="[^"]*"/name="memory" value="2GiB"/' /etc/ImageMagick-?/policy.xml && \
