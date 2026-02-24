@@ -311,7 +311,7 @@ is_dvc_created() {
 }
 
 docker_compose_up() {
-    if is_container_running; then
+    if is_container_running && [ ${FUNCNAME[1]} != upgrade_ohb ]; then
         echo "OHB is already running."
         RETVAL=0
     else
