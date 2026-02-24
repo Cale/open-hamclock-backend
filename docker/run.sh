@@ -9,6 +9,7 @@ cp -a /opt/hamclock-backend/ham/HamClock /opt/hamclock-backend/htdocs/ham
 if [ "$ENABLE_DASHBOARD" == true ]; then
     cp -a /opt/hamclock-backend/ham/dashboard/* /opt/hamclock-backend/htdocs
 else
+    find /opt/hamclock-backend/htdocs -maxdepth 1 -type f -exec rm -f "{}" +
     cp /opt/hamclock-backend/ham/dashboard/favicon.ico /opt/hamclock-backend/htdocs
     cp /opt/hamclock-backend/ham/dashboard/ascii.txt /opt/hamclock-backend/htdocs
 fi
