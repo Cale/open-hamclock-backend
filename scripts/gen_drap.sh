@@ -50,6 +50,12 @@ END {
     }
 }')
 
+# sanitize NEW_ROW to a single non-empty line (prevents accidental blank lines / CRs)
+NEW_ROW="$(printf '%s' "$NEW_ROW" | tr -d '\r' | awk 'NF{print; exit}')"
+
+# optional but recommended: fail fast if sanitize leaves it empty
+[ -n "$NEW_ROW" ] || { echo "ERROR: NEW_ROW empty after sanitize" >&2; rm -f "$TMPFILE"; exit 1; }
+
 # 5. Save the new timestamp
 echo "$CURRENT_VALID_DATE" > "$LAST_DATE_FILE"
 
