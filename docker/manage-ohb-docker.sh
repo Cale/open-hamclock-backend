@@ -252,7 +252,7 @@ is_ohb_installed() {
         echo "  Base docker image: '$CURRENT_IMAGE_BASE'"
         echo "  Docker image tag:  '$CURRENT_TAG'"
         echo "  HTTP PORT in use:  '$CURRENT_HTTP_PORT'"
-        echo "  Dashboard enabled: '$CURRENT_DASHBOARD_INSTALL'"
+        echo "  Dashboard enabled: '$STICKY_DASHBOARD_INSTALL'"
     fi
 
     if !  is_container_running; then
