@@ -92,20 +92,16 @@ def parse_wwv_flux(text: str) -> int:
         raise ValueError("Could not parse WWV 'Solar flux NNN' line")
     return int(m.group(1))
 
-
 def build_phase3_bridge(obs_flux: int) -> List[int]:
     """
-    CSI-like 3-day tail heuristic:
-      +2, +3, +3 increments from the observed WWV value.
+    CSI-like 3-day tail heuristic (current observed pattern):
+      [obs, obs+2, obs+5]
 
     Example:
-      110 -> [112, 115, 118]
+      120 -> [120, 122, 125]
+      110 -> [110, 112, 115]
     """
-    v1 = obs_flux + 2
-    v2 = v1 + 3
-    v3 = v2 + 3
-    return [v1, v2, v3]
-
+    return [obs_flux, obs_flux + 2, obs_flux + 5]
 
 def expand_tripled(values: List[int]) -> List[int]:
     out: List[int] = []
