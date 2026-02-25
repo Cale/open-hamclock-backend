@@ -127,13 +127,14 @@ The build-image.sh utility will create an image for you based on the git branch 
 Upgrading OHB is easy. Basically get the latest manager utility and run the manager utility with upgrade. Like the install, it will default to the current version, or fall back to latest. You should provide the tag you want to upgrade to if the default isn't what you want:
 ```
 # use the version you want. Let's assume it's version: <version>
-curl -sLO https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/<version>/manage-ohb-docker-<version>.sh
+curl -sL -o manage-ohb-docker.sh https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/<version>/manage-ohb-docker-<version>.sh
 
-# Make it executable
-chmod +x manage-ohb-docker-<version>.sh
+# Make it executable and double check:
+chmod +x manage-ohb-docker.sh
+./manage-ohb-docker.sh version
 
 # Run the upgrade (you can use '-t <different version>' if you want)
-./manage-ohb-docker-<version>.sh upgrade
+./manage-ohb-docker.sh upgrade
 ```
 
 The data is persisted in the storage space you created in the first install. It will have the history after you upgrade. If there are new features, possibly those could take a while to populate. It just depends on the feature.
