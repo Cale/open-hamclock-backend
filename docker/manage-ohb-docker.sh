@@ -237,8 +237,22 @@ install_ohb() {
 
 is_ohb_installed() {
     echo "$THIS version: '$OHB_MANAGER_VERSION'"
-    echo
 
+    echo
+    echo "Checking for OHB source code from git ..."
+    if [ -n "$GIT_VERSION" ]; then
+        if [ -n "$GIT_TAG" ]; then
+            echo "  release: '$GIT_TAG'"
+        elif [ -n "$GIT_VERSION" ]; then
+            echo "  git hash: '$GIT_VERSION'"
+        fi
+    else
+        echo "  git checkout not found."
+    fi
+    TAG_FROM_GIT=$(curl -s --connect-timeout 2 "https://api.github.com/repos/BrianWilkinsFL/open-hamclock-backend/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo "  Latest release available from GitHub: '$TAG_FROM_GIT'"
+
+    echo
     echo "Checking for docker ..."
     if ! is_docker_installed | sed 's/^/  /'; then
         RETVAL=1
@@ -278,20 +292,6 @@ is_ohb_installed() {
         echo
         echo "OHB appears to be in a failed state. Try '$THIS up' and look for docker errors."
     fi
-
-    echo
-    echo "Checking for OHB source code from git ..."
-    if [ -n "$GIT_VERSION" ]; then
-        if [ -n "$GIT_TAG" ]; then
-            echo "  release: '$GIT_TAG'"
-        elif [ -n "$GIT_VERSION" ]; then
-            echo "  git hash: '$GIT_VERSION'"
-        fi
-    else
-        echo "  git checkout not found."
-    fi
-    TAG_FROM_GIT=$(curl -s --connect-timeout 2 "https://api.github.com/repos/BrianWilkinsFL/open-hamclock-backend/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    echo "  Latest release available from GitHub: '$TAG_FROM_GIT'"
 }
 
 upgrade_ohb() {
@@ -334,6 +334,7 @@ is_docker_installed() {
     else
         echo "$DOCKERD_VERSION"
         echo "$DOCKER_COMPOSE_VERSION"
+        echo "$JQ_VERSION"
     fi
     return $RETVAL
 }
