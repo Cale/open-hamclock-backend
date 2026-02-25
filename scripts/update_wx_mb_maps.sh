@@ -11,6 +11,9 @@
 set -euo pipefail
 export LC_ALL=C
 
+export GMT_USERDIR=/opt/hamclock-backend/tmp
+cd "$GMT_USERDIR"
+
 OUTDIR="/opt/hamclock-backend/htdocs/ham/HamClock/maps"
 TMPROOT="/opt/hamclock-backend/tmp"
 export MPLCONFIGDIR="$TMPROOT/mpl"
@@ -18,6 +21,9 @@ export MPLCONFIGDIR="$TMPROOT/mpl"
 RENDER_PY="/opt/hamclock-backend/scripts/render_wx_mb_map.py"
 RAW2BMP_PY="/opt/hamclock-backend/scripts/hc_raw_to_bmp565.py"
 PYTHON_BIN="/opt/hamclock-backend/venv/bin/python3"
+if [ ! -x "$PYTHON_BIN" ]; then
+    PYTHON_BIN="/usr/bin/python3"
+fi
 
 # Load unified size list
 # shellcheck source=/dev/null
