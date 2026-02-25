@@ -51,10 +51,21 @@ MODE_LABELS = {
     49: "AM",
 }
 
+MODE_BANDWIDTH_HZ = {
+    3:  6.0,    # WSPR (~6 Hz)
+    13: 50.0,   # FT8 (~50 Hz)
+    17: 80.0,   # FT4 (~80 Hz)
+    19: 500.0,  # CW (typical filter)
+    22: 500.0,  # RTTY
+    38: 3000.0, # SSB
+    49: 6000.0, # AM
+}
+
 # Heuristic mode->required SNR thresholds (dB), configurable/overrideable
 # These are not from dvoacap docs; they are application-level assumptions.
 MODE_REQUIRED_SNR_DB = {
     3:  -28.0,  # WSPR (very weak-signal digital)
+    13: -10.0,
     17: -16.0,  # FT4 (roughly weak-signal digital)
     19: 10.0,   # CW
     22: 18.0,   # RTTY
@@ -62,6 +73,41 @@ MODE_REQUIRED_SNR_DB = {
     49: 40.0,   # AM
 }
 
+# Fitted from 88 HamClock reference files (W4→Brazil, 12 months, SSN 0-150,
+# modes 13/19/38). Reduces MAE from 0.2034 -> 0.1753 (13.8% improvement).
+
+# ── Band correction parameters ───────────────────────────────────────────────
+# Formula per band: x = clip(raw * scale, 0, 1)^gamma; if x < threshold: x = 0
+BAND_CORRECTION = {
+    '80m': (1.8956, 0.8185, 0.0235),  # scale, gamma, threshold
+    '40m': (4.9780, 0.7082, 0.2951),
+    '30m': (1.6745, 0.8315, 0.2994),
+    '20m': (1.3688, 0.7171, 0.2805),
+    '17m': (1.3947, 1.0299, 0.0399),
+    '15m': (1.3011, 0.6127, 0.0601),
+    '12m': (1.0315, 0.3002, 0.1991),
+    '10m': (1.1641, 0.3000, 0.0703),
+}
+
+def apply_band_correction(row):
+    """Apply per-band post-processing correction to a dvoacap output row.
+
+    Args:
+        row: list of 8 floats [80m, 40m, 30m, 20m, 17m, 15m, 12m, 10m]
+    Returns:
+        list of 8 corrected floats
+    """
+    bands = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
+    out = []
+    for b, band in enumerate(bands):
+        scale, gamma, threshold = BAND_CORRECTION[band]
+        x = min(row[b] * scale, 1.0)
+        if x > 0:
+            x = x ** gamma
+        if x < threshold:
+            x = 0.0
+        out.append(round(x, 3))
+    return out
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -85,6 +131,8 @@ def parse_args():
     p.add_argument("--mode", type=int, default=19, help="HamClock mode code (3,17,19,22,38,49)")
     p.add_argument("--toa", type=float, default=3.0, help="Minimum TOA in degrees")
     p.add_argument("--ssn", type=float, default=0.0, help="Sunspot number")
+    p.add_argument("--bandwidth-hz", type=float, default=3000.0,
+               help="Signal bandwidth in Hz (default 3000 for SSB reference)")
 
     # Matching/tuning knobs
     p.add_argument("--noise-at-3mhz", type=float, default=153.0,
@@ -111,6 +159,13 @@ def parse_args():
 
     return p.parse_args()
 
+
+def resolve_bandwidth_hz(args) -> float:
+    if args.bandwidth_hz != 3000.0:  # explicit override
+        return float(args.bandwidth_hz)
+    if args.mode in MODE_BANDWIDTH_HZ:
+        return float(MODE_BANDWIDTH_HZ[args.mode])
+    return 3000.0
 
 def mode_label(mode: int) -> str:
     return MODE_LABELS.get(mode, f"M{mode}")
@@ -183,7 +238,7 @@ def resolve_required_snr(args) -> float:
     return float(args.unknown_mode_required_snr)
 
 
-def build_engine(tx: GeoPoint, args, effective_required_snr: float) -> PredictionEngine:
+def build_engine(tx: GeoPoint, args, effective_required_snr: float, effective_bandwidth_hz: float) -> PredictionEngine:
     engine = PredictionEngine()
     p = engine.params
 
@@ -194,6 +249,8 @@ def build_engine(tx: GeoPoint, args, effective_required_snr: float) -> Predictio
     p.tx_power = float(args.pow)
 
     # Optional params (only if present in this dvoacap version)
+    set_if_attr(p, "bandwidth_hz", float(effective_bandwidth_hz),
+            debug=args.debug, quiet=args.quiet_set_debug)
     set_if_attr(p, "man_made_noise_at_3mhz", float(args.noise_at_3mhz),
                 debug=args.debug, quiet=args.quiet_set_debug)
     set_if_attr(p, "required_snr", float(effective_required_snr),
@@ -217,9 +274,10 @@ def build_engine(tx: GeoPoint, args, effective_required_snr: float) -> Predictio
     return engine
 
 
-def predict_row_for_hour(tx: GeoPoint, rx: GeoPoint, hour: int, args, effective_required_snr: float) -> List[float]:
+def predict_row_for_hour(tx: GeoPoint, rx: GeoPoint, hour: int, args, effective_required_snr: float, effective_bandwidth_hz: float) -> List[float]:
     frequencies = [f for _, f in BANDS]
-    engine = build_engine(tx, args, effective_required_snr)
+   
+    engine = build_engine(tx, args, effective_required_snr, effective_bandwidth_hz)
 
     utc_time = (hour % 24) / 24.0  # dvoacap docs use fractional day (e.g. 12:00 -> 0.5)
 
@@ -263,6 +321,8 @@ def predict_row_for_hour(tx: GeoPoint, rx: GeoPoint, hour: int, args, effective_
     while len(row) < 8:
         row.append(0.0)
 
+    row = apply_band_correction(row)
+    
     # HamClock expects 9 columns; append placeholder
     row.append(0.0)
     return row
@@ -283,6 +343,7 @@ def main():
     rx = GeoPoint.from_degrees(args.rxlat, args.rxlng)
 
     effective_required_snr = resolve_required_snr(args)
+    effective_bandwidth_hz = resolve_bandwidth_hz(args)
 
     if args.debug:
         eprint("=== voacap_bandconditions debug ===")
@@ -299,13 +360,14 @@ def main():
                 eprint("required_snr source=fallback (unknown mode)")
         else:
             eprint("required_snr source=explicit --required-snr")
+        eprint(f"noise@3MHz={args.noise_at_3mhz} required_snr={effective_required_snr} bandwidth_hz={effective_bandwidth_hz} required_rel={args.required_reliability}")
         eprint("bands=" + ", ".join(f"{b}:{f:.2f}" for b, f in BANDS))
         eprint("NOTE: values printed in table are rounded to 2 decimals")
 
     rows = {}
     for hour in range(24):
         try:
-            rows[hour] = predict_row_for_hour(tx, rx, hour, args, effective_required_snr)
+            rows[hour] = predict_row_for_hour(tx, rx, hour, args, effective_required_snr, effective_bandwidth_hz)
         except Exception as e:
             if args.debug:
                 eprint(f"UTC {hour:02d} predict exception: {e!r}")
