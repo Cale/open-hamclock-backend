@@ -22,6 +22,9 @@ that HamClock depends on — built by operators, for operators.
 - Produces zlib-compressed BMP assets in multiple resolutions
 - Designed for Raspberry Pi, cloud, or on-prem deployment
 - Fully open source and community maintained
+- Auto log rotation
+- Command and Control Dashboard (future)
+- Secure
 
 ## 🧭 Architecture
 ```
