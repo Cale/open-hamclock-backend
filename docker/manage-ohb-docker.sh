@@ -20,6 +20,7 @@ GIT_VERSION=$(git rev-parse --short HEAD 2>/dev/null)
 CONTAINER=${IMAGE_BASE##*/}
 DEFAULT_HTTP_PORT=:80
 DEFAULT_DASHBOARD_INSTALL=true
+DEFAULT_EXTERNAL_HTTP_LOG=false
 # the following env is the lighttpd env file
 DEFAULT_ENV_FILE="$STARTED_FROM/.env"
 
@@ -72,7 +73,6 @@ main() {
             docker_compose_up
             ;;
         down)
-            shift && get_compose_opts "$@"
             docker_compose_down
             ;;
         generate-docker-compose)
@@ -85,29 +85,40 @@ main() {
             ;;
         *)
             echo "Invalid or missing option. Try using '$THIS help'."
-            RETVAL=1
+            exit 1
             ;;
     esac
 
-    if [ "$SAVE_STICKY_VARS" == true ]; then
+    if [ "$SAVE_STICKY_VARS" == true -a $RETVAL -eq 0 ]; then
         save_sticky_vars
     fi
 }
 
 get_compose_opts() {
-    while getopts ":p:t:e:d:" opt; do
+    while getopts ":p:t:e:d:l:" opt; do
         case $opt in
-            p)
-                REQUESTED_HTTP_PORT="$OPTARG"
-                ;;
             d)
                 REQUESTED_DASHBOARD_INSTALL="$OPTARG"
-                ;;
-            t)
-                REQUESTED_TAG="$OPTARG"
+                if [ "$REQUESTED_DASHBOARD_INSTALL" != true -a "$REQUESTED_DASHBOARD_INSTALL" != false ]; then
+                    echo "ERROR: -$opt option must be <true|false>"
+                    exit 1
+                fi
                 ;;
             e)
                 REQUESTED_ENV_FILE="$OPTARG"
+                ;;
+            l)
+                REQUESTED_EXTERNAL_HTTP_LOG="$OPTARG"
+                if [ "$REQUESTED_EXTERNAL_HTTP_LOG" != true -a "$REQUESTED_EXTERNAL_HTTP_LOG" != false ]; then
+                    echo "ERROR: -$opt option must be <true|false>"
+                    exit 1
+                fi
+                ;;
+            p)
+                REQUESTED_HTTP_PORT="$OPTARG"
+                ;;
+            t)
+                REQUESTED_TAG="$OPTARG"
                 ;;
             \?) # Handle invalid options
                 echo "Command '$COMMAND': Invalid option: -$OPTARG" >&2
@@ -119,6 +130,7 @@ get_compose_opts() {
                 ;;
         esac
     done
+
     SAVE_STICKY_VARS=true
 }
 
@@ -195,6 +207,7 @@ save_sticky_vars() {
 STICKY_HTTP_PORT="$HTTP_PORT"
 STICKY_DASHBOARD_INSTALL="$ENABLE_DASHBOARD"
 STICKY_LIGHTTPD_ENV_FILE="$ENV_FILE"
+STICKY_EXTERNAL_HTTP_LOG="$ENABLE_EXTERNAL_HTTP_LOG"
 EOF
 }
 
@@ -233,8 +246,9 @@ is_ohb_installed() {
     fi
     echo
 
+    echo "Checking for OHB ..."
     if is_dvc_exists; then
-        echo "OHB is installed"
+        echo "  OHB persistent storage found."
     else
         echo "OHB does not appear to be installed."
         RETVAL=1
@@ -243,35 +257,41 @@ is_ohb_installed() {
 
     get_current_image_tag
     if [ -z "$CURRENT_TAG" ]; then
+        echo
         echo "OHB does not appear to be running. Try running '$THIS up'"
         RETVAL=1
         return $RETVAL
     else
         get_current_http_port
-        echo
-        echo "  Base docker image: '$CURRENT_IMAGE_BASE'"
-        echo "  Docker image tag:  '$CURRENT_TAG'"
+        echo "  OHB version:       '$CURRENT_TAG'"
+        echo "  Docker image:      '$CURRENT_IMAGE_BASE:$CURRENT_TAG'"
         echo "  HTTP PORT in use:  '$CURRENT_HTTP_PORT'"
-        echo "  Dashboard enabled: '$STICKY_DASHBOARD_INSTALL'"
+        echo -n "  Dashboard enabled: "
+        if [ -n "$STICKY_DASHBOARD_INSTALL" ]; then
+            echo "'$STICKY_DASHBOARD_INSTALL'"
+        else
+            echo "Unknown"
+        fi
     fi
 
-    if !  is_container_running; then
+    if ! is_container_running; then
         echo
         echo "OHB appears to be in a failed state. Try '$THIS up' and look for docker errors."
     fi
 
+    echo
+    echo "Checking for OHB source code from git ..."
     if [ -n "$GIT_VERSION" ]; then
-        echo
-        echo "You appear to have OHB source code checked out from git."
-        echo
         if [ -n "$GIT_TAG" ]; then
-            echo "  On a tagged release: '$GIT_TAG'"
+            echo "  release: '$GIT_TAG'"
         elif [ -n "$GIT_VERSION" ]; then
-            echo "  Not on a tagged release. git hash: '$GIT_VERSION'"
-        else
-            echo "  Not running from a git checkout."
+            echo "  git hash: '$GIT_VERSION'"
         fi
+    else
+        echo "  git checkout not found."
     fi
+    TAG_FROM_GIT=$(curl -s --connect-timeout 2 "https://api.github.com/repos/BrianWilkinsFL/open-hamclock-backend/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo "  Latest release available from GitHub: '$TAG_FROM_GIT'"
 }
 
 upgrade_ohb() {
@@ -336,7 +356,7 @@ is_dvc_created() {
 docker_compose_up() {
     if is_container_running && [ ${FUNCNAME[1]} != upgrade_ohb ]; then
         echo "OHB is already running."
-        RETVAL=0
+        RETVAL=1
     else
         docker_compose_yml && docker compose -f <(echo "$DOCKER_COMPOSE_YML") create 
         if [ -n "$REQUESTED_ENV_FILE" -o -n "$STICKY_LIGHTTPD_ENV_FILE" -o -r "$DEFAULT_ENV_FILE" ]; then
@@ -527,6 +547,23 @@ determine_dashboard() {
     fi
 }
 
+determine_http_log() {
+
+    # first precedence
+    if [ -n "$REQUESTED_EXTERNAL_HTTP_LOG" ]; then
+        ENABLE_EXTERNAL_HTTP_LOG=$REQUESTED_EXTERNAL_HTTP_LOG
+
+    # second precedence
+    elif [ -n "$STICKY_EXTERNAL_HTTP_LOG" ]; then
+        ENABLE_EXTERNAL_HTTP_LOG=$STICKY_EXTERNAL_HTTP_LOG
+
+    # third precedence
+    else
+        ENABLE_EXTERNAL_HTTP_LOG=$DEFAULT_EXTERNAL_HTTP_LOG
+
+    fi
+}
+
 determine_tag() {
     get_current_image_tag
 
@@ -563,6 +600,8 @@ docker_compose_yml() {
 
     determine_dashboard
 
+    determine_http_log
+
     if [ "$TAG" == "$CURRENT_TAG"  -a "$REQUEST_DOCKER_PULL" == true ]; then
         echo "Doing a docker pull of the image before docker compose."
         docker pull $IMAGE | sed 's/^/  /'
@@ -575,7 +614,8 @@ docker_compose_yml() {
             sed "s|__IMAGE__|$IMAGE|" |
             sed "s/__CONTAINER__/$CONTAINER/" |
             sed "s/__HTTP_PORT__/$HTTP_PORT/" |
-            sed "s/__ENABLE_DASHBOARD__/$ENABLE_DASHBOARD/"
+            sed "s/__ENABLE_DASHBOARD__/$ENABLE_DASHBOARD/" |
+            sed "s|__ENABLE_EXTERNAL_HTTP_LOG__|- $HERE/logs/lighttpd:/var/log/lighttpd:rw|"
     )
 }
 
@@ -595,6 +635,7 @@ services:
       - __HTTP_PORT__:80
     volumes:
       - ohb-htdocs:/opt/hamclock-backend/htdocs
+      __ENABLE_EXTERNAL_HTTP_LOG__
     healthcheck:
       test: ["CMD", "curl", "-f", "-A", "healthcheck/1.0", "http://localhost:80/ham/HamClock/version.pl"]
       timeout: "5s"
