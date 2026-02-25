@@ -1,6 +1,11 @@
 on:
   workflow_dispatch:
-  
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g., v0.0.1)'
+        required: true
+        default: 'v0.0.0'
+
 jobs:
   github-releases-to-discord:
     runs-on: ubuntu-latest
@@ -11,6 +16,8 @@ jobs:
         uses: SethCohen/github-releases-to-discord@v1
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.event.inputs.tag_name }}
           color: "2105893"
           username: "Release Changelog"
           avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
