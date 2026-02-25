@@ -41,6 +41,15 @@ if [ ! -f "$TLEFILE" ]; then
     mv "$TMPFILE" "$TLEFILE"
     cp "$TLEFILE" "$ARCHIVE/tles-$(ts).txt"
     echo "Initial TLE install"
+    TODAY=$(date -u +"%Y%m%d")
+    echo "[$(ts)] Running AMSAT status filter..."
+    if env ESATS_TLE_CACHE="$TLEFILE" ESATS_OUT="$ESATS_OUT" perl "$FILTER"; then
+        echo "$TODAY" > "$FILTER_STAMP"
+        echo "[$(ts)] AMSAT filter complete — esats.txt updated"
+    else
+        echo "WARNING: AMSAT filter failed — esats.txt not updated"
+    fi
+    exit 0
 fi
 
 OLDHASH=$(sha256sum "$TLEFILE" | awk '{print $1}')
