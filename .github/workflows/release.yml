@@ -18,10 +18,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add tag to manager
+      - name: Prepare assets
         run: |
-          sed 's/^\(OHB_MANAGER_VERSION=\).*$/\1${{ github.event.inputs.tag_name }}/' ./docker/manage-ohb-docker.sh \
-          > ./docker/manage-ohb-docker-${{ github.event.inputs.tag_name }}.sh
+          # Define asset names with the tag
+          TAG="${{ github.event.inputs.tag_name }}"
+          REF="${{ github.ref_name }}"
+          MGR_NAME="manage-ohb-docker-$TAG.sh"
+
+          # create a manager with version in the name and file
+          sed "s/^\(OHB_MANAGER_VERSION=\).*$/\1$TAG/" ./docker/manage-ohb-docker.sh \
+          > "./docker/$MGR_NAME"
+
+          # add version artifact
+          echo "TAG=$TAG" > VERSION.txt
+
+          # create the tars and zips
+          mkdir dist
+          tar -czf "dist/OHB-$TAG.tar.gz" --exclude=dist .
+          zip -r "dist/OHB-$TAG.zip" . -x "dist/*"
 
       - name: Create Release and Upload Asset
         env:
@@ -29,6 +43,8 @@ jobs:
         run: |
           # Grabs file from repo tree and uploads with a label
           gh release create ${{ github.event.inputs.tag_name }} \
-            './docker/manage-ohb-docker-${{ github.event.inputs.tag_name }}.sh#Manage Docker Installs' \
+            "./docker/manage-ohb-docker-${{ github.event.inputs.tag_name }}.sh#Manage OHB Docker Installs" \
+            "dist/OHB-${{ github.event.inputs.tag_name }}.tar.gz#OHB Source Tarball" \
+            "dist/OHB-${{ github.event.inputs.tag_name }}.zip#OHB Source Zip" \
             --title "OHB Release: ${{ github.event.inputs.tag_name }}" \
             --generate-notes
