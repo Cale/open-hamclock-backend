@@ -11,6 +11,7 @@ ESATS_OUT="/opt/hamclock-backend/htdocs/ham/HamClock/esats/esats.txt"
 FILTER="/opt/hamclock-backend/scripts/filter_amsat_active.pl"
 
 mkdir -p "$TLEDIR" "$ARCHIVE"
+mkdir -p "$TLEDIR" "$ARCHIVE" "$(dirname "$ESATS_OUT")"
 
 URLS=(
   "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle"
