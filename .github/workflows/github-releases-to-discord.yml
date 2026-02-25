@@ -12,12 +12,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Get Release
+        id: get_release
+        run: |
+          release=$(gh release view ${{ github.event.inputs.tag_name }} --json body,tagName)
+          echo "body=$(echo $release | jq -r '.body')" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: GitHub Releases to Discord
         uses: SethCohen/github-releases-to-discord@v1
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.event.inputs.tag_name }}
           color: "2105893"
           username: "Release Changelog"
           avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
