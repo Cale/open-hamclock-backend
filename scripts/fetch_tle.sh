@@ -5,8 +5,10 @@ TLEDIR="/opt/hamclock-backend/tle"
 ARCHIVE="$TLEDIR/archive"
 TLEFILE="$TLEDIR/tles.txt"
 TMPFILE="$TLEDIR/tles.new"
+FILTER_STAMP="$TLEDIR/.amsat_filter_date"
+ESATS_OUT="/opt/hamclock-backend/htdocs/ham/HamClock/esats/esats.txt"
 
-ESATS="/opt/hamclock-backend/scripts/build_esats.pl"
+FILTER="/opt/hamclock-backend/scripts/filter_amsat_active.pl"
 
 mkdir -p "$TLEDIR" "$ARCHIVE"
 
@@ -38,7 +40,6 @@ if [ ! -f "$TLEFILE" ]; then
     mv "$TMPFILE" "$TLEFILE"
     cp "$TLEFILE" "$ARCHIVE/tles-$(ts).txt"
     echo "Initial TLE install"
-    exec "$ESATS"
 fi
 
 OLDHASH=$(sha256sum "$TLEFILE" | awk '{print $1}')
@@ -47,20 +48,34 @@ NEWHASH=$(sha256sum "$TMPFILE" | awk '{print $1}')
 if [[ "$OLDHASH" == "$NEWHASH" ]]; then
     rm "$TMPFILE"
     echo "No TLE change"
-    exit 0
+else
+    STAMP="$(ts)"
+
+    # Archive old + new
+    cp "$TLEFILE" "$ARCHIVE/tles-${STAMP}-old.txt"
+    cp "$TMPFILE" "$ARCHIVE/tles-${STAMP}-new.txt"
+
+    # Atomic replace
+    mv "$TMPFILE" "$TLEFILE"
+
+    echo "TLE updated ($STAMP)"
+
+    # Keep last 60 snapshots (~15 days at 6h cadence)
+    ls -1t "$ARCHIVE"/tles-* 2>/dev/null | tail -n +61 | xargs -r rm --
 fi
 
-STAMP="$(ts)"
+# Run AMSAT filter once per UTC day, or if esats.txt is missing
+TODAY=$(date -u +"%Y%m%d")
+LAST_FILTER=$(cat "$FILTER_STAMP" 2>/dev/null || echo "")
 
-# Archive old + new
-cp "$TLEFILE" "$ARCHIVE/tles-${STAMP}-old.txt"
-cp "$TMPFILE" "$ARCHIVE/tles-${STAMP}-new.txt"
-
-# Atomic replace
-mv "$TMPFILE" "$TLEFILE"
-
-echo "TLE updated ($STAMP) — rebuilding ESATS"
-
-# Keep last 60 snapshots (~15 days at 6h cadence)
-ls -1t "$ARCHIVE"/tles-* 2>/dev/null | tail -n +61 | xargs -r rm --
-exec "$ESATS"
+if [[ "$LAST_FILTER" != "$TODAY" ]] || [[ ! -f "$ESATS_OUT" ]]; then
+    echo "[$(ts)] Running AMSAT status filter..."
+    if env ESATS_TLE_CACHE="$TLEFILE" ESATS_OUT="$ESATS_OUT" perl "$FILTER"; then
+        echo "$TODAY" > "$FILTER_STAMP"
+        echo "[$(ts)] AMSAT filter complete — esats.txt updated"
+    else
+        echo "WARNING: AMSAT filter failed — esats.txt not updated"
+    fi
+else
+    echo "[$(ts)] AMSAT filter already ran today — skipping"
+fi
