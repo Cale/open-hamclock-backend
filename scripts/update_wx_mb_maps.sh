@@ -86,13 +86,20 @@ make_wx_line_overlay_png() {
 
   rm -f "$png" "$out_png"
 
-  # Run GMT inside TMPDIR so output path is deterministic
+   local ps="$TMPDIR/${stem_base}.ps"
   (
-    cd "$TMPDIR"
-    gmt begin "$stem_base" png
-      gmt coast -R-180/180/-90/90 -JQ0/${W}p -W0.6p,black -N1/0.45p,black -A10000
-    gmt end
-  ) || { echo "gmt failed for Wx line overlay ${W}x${H}" >&2; return 1; }
+    cd "$TMPDIR" || exit 1
+    rm -f "$ps" "$png"
+
+    gmt pscoast \
+      -R-180/180/-90/90 \
+      -JX${W}p/${H}p \
+      -X0 -Y0 \
+      -W0.6p,black -N1/0.45p,black -A10000 \
+      -B0 -P -K > "$ps" && \
+    gmt psxy -R -J -T -O >> "$ps" && \
+    gmt psconvert "$ps" -Tg -A -F"$stem_base"
+  ) || { echo "gmt failed for Wx line overlay ${W}x${H}" >&2; return 1;} 
 
   [[ -f "$png" ]] || {
     echo "line overlay PNG not found: $png" >&2
