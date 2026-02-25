@@ -12,7 +12,7 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] ssn/ssn-history.txt
 - [x] solar-flux/solarflux-99.txt
 - [x] geomag/kindex.txt
-- [x] dst/dst.txt
+- [ ] dst/dst.txt - proxied by CSI until we can work out kinks
 - [x] drap/stats.txt
 - [x] solar-wind/swind-24hr.txt
 - [x] ssn/ssn-31.txt
@@ -40,12 +40,12 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] ham/HamClock/wx.pl
 - [x] ham/HamClock/fetchIPGeoloc.pl - requires free tier 1000 req per day account and API key
 - [x] ham/HamClock/fetchBandConditions.pl
-- [ ] ham/HamClock/fetchVOACAPArea.pl
-- [ ] ham/HamClock/fetchVOACAP-MUF.pl?YEAR=2026&MONTH=1&UTC=17&TXLAT=&TXLNG=&PATH=0&WATTS=100&WIDTH=660&HEIGHT=330&MHZ=0.00&TOA=3.0&MODE=19&TOA=3.0
-- [ ] ham/HamClock/fetchVOACAP-TOA.pl?YEAR=2026&MONTH=1&UTC=17&TXLAT=&TXLNG=&PATH=0&WATTS=100&WIDTH=660&HEIGHT=330&MHZ=14.10&TOA=3.0&MODE=19&TOA=3.0
-- [x] ham/HamClock/fetchPSKReporter.pl?ofgrid=XXYY&maxage=1800
+- [ ] ham/HamClock/fetchVOACAPArea.pl - proxied by CSI until we can work out complex task
+- [ ] ham/HamClock/fetchVOACAP-MUF.pl - proxied by CSI until we can work out complex task
+- [ ] ham/HamClock/fetchVOACAP-TOA.pl - proxied by CSI until we can work out complex task
+- [x] ham/HamClock/fetchPSKReporter.pl=
 - [x] ham/HamClock/fetchWSPR.pl
-- [ ] ham/HamClock/fetchRBN.pl
+- [x] ham/HamClock/fetchRBN.pl
 
 ### Static Files
 - [x] ham/HamClock/cities2.txt
@@ -55,7 +55,6 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] GOES-16 X-Ray
 - [x] Countries map download
 - [x] Terrain map download
-- [x] DRAP map generation, download, and display
 - [x] SDO generation, download, and display
 - [x] MUF-RT map generation, download, and display
 - [x] Weather map generation, download, and display
@@ -69,7 +68,7 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] Planetary Kp data generation, pull and display
 - [x] Solar flux data generation, pull and display
 - [x] Amateur Satellites data generation, pull and display
-- [ ] PSK Reporter WSPR
-- [X] VOACAP DE DX
-- [ ] VOACAP MUF MAP
-- [ ] RBN
+- [x] PSK Reporter WSPR
+- [X] VOACAP DE DX - proxied
+- [x] VOACAP MUF MAP - proxied
+- [x] RBN
