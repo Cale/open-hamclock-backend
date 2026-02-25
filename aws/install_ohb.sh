@@ -528,7 +528,7 @@ run_perl gen_dxnews.pl
 run_perl gen_ng3k.pl
 run_perl merge_dxpeditions.pl
 run_sh  gen_contest-calendar.sh
-run_python_to_file kindex_simple.py "$BASE/htdocs/ham/HamClock/geomag/kindex.txt"
+run_python kindex_simple.py
 run_sh  update_cloud_maps.sh
 run_sh  update_drap_maps.sh
 run_sh  gen_dst.sh
