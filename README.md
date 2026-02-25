@@ -56,7 +56,7 @@ https://discord.gg/wb8ATjVn6M
 
 <img width="798" height="568" alt="image" src="https://github.com/user-attachments/assets/14b24350-c0a5-4b00-a36f-9c34c74fef3d" />
 <img width="799" height="568" alt="image" src="https://github.com/user-attachments/assets/f10d67f5-186c-43b6-b9d9-71149fd897f7" />
-<img width="795" height="569" alt="image" src="https://github.com/user-attachments/assets/476bb210-fe1d-4caf-9243-5ada8fffc608" />
+<img width="804" height="482" alt="image" src="https://github.com/user-attachments/assets/e1778c0e-e22c-4a42-8e50-789b1bc85692" />
 <img width="797" height="569" alt="image" src="https://github.com/user-attachments/assets/35e843bf-f2c6-4b99-881b-1bf675660b7a" />
 <img width="797" height="571" alt="image" src="https://github.com/user-attachments/assets/859d158c-e441-4788-bd67-3aaa48be45e0" />
 <img width="797" height="476" alt="image" src="https://github.com/user-attachments/assets/b8644372-0d6c-4c81-9eeb-ee5d763b490d" />
