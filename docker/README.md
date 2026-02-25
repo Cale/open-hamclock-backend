@@ -38,6 +38,15 @@ Your version could be a little bit older. However a clue that your version is ve
 
 Be sure you have a recent docker and docker compose installed before proceeding.
 
+## Install jq
+Some Linux distributions install jq by default and some don't. We'll need this command, also.
+
+Check if it's installed:
+```
+jq --version
+```
+Most any version should be fine. If not installed, use your distribution's package manager to install it.
+
 # Install OHB with official images
 ## The steps if I want to use the official image from Docker Hub
 
