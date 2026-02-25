@@ -1,5 +1,3 @@
-name: Release with manage-ohb-docker.sh asset
-
 on:
   workflow_dispatch:
     inputs:
@@ -9,26 +7,27 @@ on:
         default: 'v0.0.0'
 
 jobs:
-  release:
+  github-releases-to-discord:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Required to create releases
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Add tag to manager
+      - name: Get Release
+        id: get_release
         run: |
-          sed 's/^\(OHB_MANAGER_VERSION=\).*$/\1${{ github.event.inputs.tag_name }}/' ./docker/manage-ohb-docker.sh \
-          > ./docker/manage-ohb-docker-${{ github.event.inputs.tag_name }}.sh
-
-      - name: Create Release and Upload Asset
+          release=$(gh release view ${{ github.event.inputs.tag_name }} --json body,tagName)
+          echo "body=$(echo $release | jq -r '.body')" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Grabs file from repo tree and uploads with a label
-          gh release create ${{ github.event.inputs.tag_name }} \
-            './docker/manage-ohb-docker-${{ github.event.inputs.tag_name }}.sh#Manage Docker Installs' \
-            --title "OHB Release: ${{ github.event.inputs.tag_name }}" \
-            --generate-notes
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: GitHub Releases to Discord
+        uses: SethCohen/github-releases-to-discord@v1
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          color: "2105893"
+          username: "Release Changelog"
+          avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
+          content: "||@everyone||"
+          footer_title: "Changelog"
+          reduce_headings: true
