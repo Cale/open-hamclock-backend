@@ -60,6 +60,7 @@ https://discord.gg/wb8ATjVn6M
 <img width="797" height="569" alt="image" src="https://github.com/user-attachments/assets/35e843bf-f2c6-4b99-881b-1bf675660b7a" />
 <img width="797" height="571" alt="image" src="https://github.com/user-attachments/assets/859d158c-e441-4788-bd67-3aaa48be45e0" />
 <img width="797" height="476" alt="image" src="https://github.com/user-attachments/assets/b8644372-0d6c-4c81-9eeb-ee5d763b490d" />
+<img width="801" height="480" alt="image" src="https://github.com/user-attachments/assets/8313d34e-e71c-4455-98c4-7f204d3ac59f" />
 
 ## 🚀 Quick Start 👉 [Quick Start Guide](QUICK_START.md)
 ## 📦 Installation 👉 [Detailed installation instructions](INSTALL.md)
