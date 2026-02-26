@@ -243,19 +243,18 @@ sudo chown -R www-data:www-data "$BASE/etc"
 # ---------- python venv ----------
 STEP=$((STEP+1)); progress $STEP $STEPS
 echo -e "${BLU}==> Creating Python virtualenv${NC}"
-
-sudo -u www-data mkdir -p "$BASE/tmp/pip-cache"
 sudo -u www-data mkdir -p "$BASE/tmp/worldwx"
 sudo -u www-data mkdir -p "$BASE/tmp/mpl"
 
-sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" PIP_CACHE_DIR="$BASE/tmp/pip-cache" \
-python3 -m venv "$VENV" & spinner $!
+sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" \
+    python3 -m venv "$VENV" & spinner $!
 
-sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" PIP_CACHE_DIR="$BASE/tmp/pip-cache" \
-"$VENV/bin/pip" install --upgrade pip & spinner $!
+sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" \
+    "$VENV/bin/pip" install --no-cache-dir --upgrade pip & spinner $!
 
-sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" PIP_CACHE_DIR="$BASE/tmp/pip-cache" \
-"$VENV/bin/pip" install requests numpy pygrib matplotlib pandas scipy feedparser beautifulsoup4 lxml >/dev/null &
+sudo -u www-data env HOME="$BASE/tmp" XDG_CACHE_HOME="$BASE/tmp" \
+    "$VENV/bin/pip" install --no-cache-dir \
+    requests numpy pygrib matplotlib pandas scipy feedparser beautifulsoup4 lxml >/dev/null &
 spinner $!
 
 # ---------- relocate ham ----------
