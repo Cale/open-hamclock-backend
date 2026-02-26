@@ -193,6 +193,11 @@ $THIS <COMMAND> [options]:
             writes the docker compose file to STDOUT
             -p: set the HTTP port (defaults to current setting)
             -t: set image tag
+
+    upgrade-me:
+            downloads the latest tagged version of itself and overwrites itself. Runs
+            the new version to confirm it worked. Does an sha256 validation before
+            overwriting itself.
 EOF
 }
 
