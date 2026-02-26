@@ -222,6 +222,7 @@ EOF
 
 upgrade_this_script() {
     CHECK_LATEST_JSON=$(curl -s "$GITHUB_LATEST_RELEASE_URL")
+
     URL_LATEST_THIS=$(echo "$CHECK_LATEST_JSON" | jq -r ".assets[] | select(.browser_download_url | contains(\"$DOCKER_PROJECT\")) | .browser_download_url")
     DIGEST_LATEST_THIS=$(echo "$CHECK_LATEST_JSON" | jq -r ".assets[] | select(.browser_download_url | contains(\"$DOCKER_PROJECT\")) | .digest")
 
@@ -230,7 +231,7 @@ upgrade_this_script() {
 
     if [ "$AVAILABLE_VERSION" == "$OHB_MANAGER_VERSION" ]; then
         echo "$THIS is currently the latest version: '$OHB_MANAGER_VERSION'"
-        return 0
+        return $RETVAL
     fi
     cat <<EOF
 There is a new version: '$AVAILABLE_VERSION'. The version you have is '$OHB_MANAGER_VERSION'.
@@ -265,6 +266,7 @@ EOF
             echo "ERROR: downloaded file '$TMP_MGR_FILE' seems to be corrupted. Not using it."
             echo "  Expected: '$DIGEST_LATEST_THIS'"
             echo "  Got:      '$DIGEST_FILE'"
+            RETVAL=1
         fi
     else
         echo "Because you answered '$DOIT', we won't upgrade and overwrite. 'Y' or 'y' will do the upgrade."
