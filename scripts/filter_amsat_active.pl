@@ -55,7 +55,7 @@ while ($html =~ m{<tr[^>]*>\s*<td[^>]*>\s*(?:<a[^>]*>)?([^<]+?)(?:</a>)?\s*</td>
 
     # Check only the first 12 td cells (today's columns)
     my @tds;
-    while ($cells =~ m{<td([^>]*)>.*?</td>}gsi && @tds < 12) {
+    while ($cells =~ m{<td([^>]*)>.*?</td>}gsi && @tds < 60) {
         push @tds, $1;
     }
 
