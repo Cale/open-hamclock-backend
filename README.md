@@ -25,6 +25,42 @@ that HamClock depends on — built by operators, for operators.
 - Auto log rotation
 - Command and Control Dashboard (future)
 - Runs in Raspberry Pi 4, 5, PC, Virtual Machine, Bare Metal or Cloud
+## OHB Central Server (testing)
+These steps let you point a HamClock (or any client) at a shared OHB test server without self-hosting. This is a local-only change on your machine and is easy to revert.
+
+Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
+
+### /etc/hosts file modification
+
+```sudo nano /etc/hosts```
+
+Add this line:
+
+```44.32.64.64     clearskyinstitute.com```
+
+Save the file with CTRL+X
+
+Next, verify it is in effect
+
+```getent hosts clearskyinstitute.com```
+
+It should return
+
+```44.32.64.64     clearskyinstitute.com```
+
+Finally, you should be able to ping the re-directed host
+
+```ping -c 5 clearskyinstitute.com```
+
+It should say 100%
+
+### -b option
+
+HamClock version 4.22 has been tested with the -b option. You can connect without modifying your /etc/hosts file. 
+
+In the directory where hamclock is installed, 
+
+```./hamclock -b ohb.hamclock.app:80```
 
 ## 🧭 Architecture
 ```
