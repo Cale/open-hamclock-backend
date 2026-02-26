@@ -99,7 +99,7 @@ and if hamclock is installed in your PATH on the system then it will tell you wh
          | HamClock |
          +----------+
 ```
-## Compatibility 👉 [Compatibility][COMPATIBILITY.md]
+## Compatibility 👉 [Compatibility](COMPATIBILITY.md)
 
 See 
 ## 💬 Join us on Discord
