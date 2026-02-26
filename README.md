@@ -108,6 +108,9 @@ https://discord.gg/wb8ATjVn6M
 # OHB in Production (Live HamClock Clients)
 
 ## Automatic AMSAT Satellite Updater Backend - Keep Your Satellites Fresh!
+
+Note: This will only list **ACTIVE** AMSAT satellites from the AMSAT Status Page.
+
 <img width="795" height="459" alt="image" src="https://github.com/user-attachments/assets/47ee3b6f-2075-42e2-a55f-618a0fb9fad5" />
 <img width="798" height="568" alt="image" src="https://github.com/user-attachments/assets/14b24350-c0a5-4b00-a36f-9c34c74fef3d" />
 <img width="799" height="568" alt="image" src="https://github.com/user-attachments/assets/f10d67f5-186c-43b6-b9d9-71149fd897f7" />
