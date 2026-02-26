@@ -34,7 +34,7 @@ This is a test server and may be subject to unannounced or unplanned updates.
 Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
 
 ### /etc/hosts file modification
-The original vision of OHB was to use a 'DNS sinkhole' concept. This will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. 
+The original vision of OHB was to use a 'DNS sinkhole' concept. This will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. This is a semi-permanent change.
 
 ```sudo nano /etc/hosts```
 
@@ -60,11 +60,21 @@ It should say 100%
 
 ### -b option
 
-HamClock version 4.22 has been tested with the -b option. You can connect without modifying your /etc/hosts file. 
+HamClock version 4.22 has been tested with the -b option. You can connect without modifying your /etc/hosts file. This will allow you to switch between different backends and is the easiest option for most people. 
 
 In the directory where hamclock is installed, 
 
 ```./hamclock -b ohb.hamclock.app:80```
+
+If unsure, you can type
+
+``which hamclock``
+
+and if hamclock is installed in your PATH on the system then it will tell you where the application is installed. From there, you can type the path to hamclock
+
+``/path/to/hamclock -b ohb.hamclock.app:80``
+
+/path/to/hamclock may vary on your system
 
 ## 🧭 Architecture
 ```
