@@ -11,6 +11,8 @@ source "/opt/hamclock-backend/scripts/lib_sizes.sh"
 ohb_load_sizes
 echo "Building sizes: ${OHB_SIZES_NORM}"
 
+gmt set GMT_GRAPHICS_FORMAT png
+
 MUFD_URL="https://prop.kc2g.com/renders/current/mufd-normal-now.geojson"
 STAS_URL="https://prop.kc2g.com/api/stations.json"
 OUTDIR="/opt/hamclock-backend/htdocs/ham/HamClock/maps"
@@ -225,4 +227,6 @@ done
 rm -f mufd.geojson stations.json mufd_grid.xyz mufd.grd \
       stations_circles.txt stations_labels.txt
 
+echo "Sleeping for 30 seconds..."
+sleep 30
 echo "Done."
