@@ -59,7 +59,7 @@ https://github.com/BrianWilkinsFL/open-hamclock-backend/tags
 ```
 Navigate into the tag, download from ```Manage Docker Installs``` which will get you a file named: ```manage-ohb-docker-<version>.sh```. Make it executable. Using curl might work like this for v1.0:
 ```
-curl -sO https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/v1.0/manage-ohb-docker-v1.0.sh
+curl -sLO https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/v1.0/manage-ohb-docker-v1.0.sh
 chmod +x manage-ohb-docker-v1.0.sh
 ```
 Plug in the version you downloaded for v1.0 in this example.
@@ -133,7 +133,26 @@ The build-image.sh utility will create an image for you based on the git branch 
 ```
 
 # Upgrades
-Upgrading OHB is easy. Get the latest manager utility and run the manager utility with 'upgrade' command. Like install, it defaults to the current version, or falls back to latest. If the default version isn't what you want, provide the -t option.
+Upgrading OHB is easy.
+
+## versions starting with v0.24
+If your manager utility version is 0.24 or later, it can upgrade itself.
+```
+./manager-ohb-docker.sh version
+```
+
+This is how to self-upgrade the utility:
+```
+./manager-ohb-docker.sh upgrade-me
+```
+
+If it shows the latest version at the end, then use it to upgrade OHB:
+```
+./manager-ohb-docker.sh upgrade
+```
+
+## versions v0.23 and older
+Get the latest manager utility and run the manager utility with 'upgrade' command. Like install, it defaults to the current version, or falls back to latest. If the default version isn't what you want, provide the -t option.
 ```
 # Get the version you want. Let's assume it's version: <version>
 curl -sL -o manage-ohb-docker.sh https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/<version>/manage-ohb-docker-<version>.sh
@@ -141,6 +160,9 @@ curl -sL -o manage-ohb-docker.sh https://github.com/BrianWilkinsFL/open-hamclock
 # Make it executable and double check:
 chmod +x manage-ohb-docker.sh
 ./manage-ohb-docker.sh version
+
+# If you get an error, the file is probably corrupted. Confirm it's actually bash script:
+head manage-ohb-docker.sh
 
 # Run the upgrade command (you can use '-t <different version>' if you want)
 ./manage-ohb-docker.sh upgrade
