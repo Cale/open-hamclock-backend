@@ -25,8 +25,11 @@ that HamClock depends on — built by operators, for operators.
 - Auto log rotation
 - Command and Control Dashboard (future)
 - Runs in Raspberry Pi 4, 5, PC, Virtual Machine, Bare Metal or Cloud
+  
 ## OHB Central Server (testing)
 These steps let you point a HamClock (or any client) at a shared OHB test server without self-hosting. This is a local-only change on your machine and is easy to revert.
+
+This is a test server and may be subject to unannounced or unplanned updates. 
 
 Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
 
