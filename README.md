@@ -24,7 +24,7 @@ that HamClock depends on — built by operators, for operators.
 - Fully open source and community maintained
 - Auto log rotation
 - Command and Control Dashboard (future)
-- Secure
+- Runs in Raspberry Pi 4, 5, PC, Virtual Machine, Bare Metal or Cloud
 
 ## 🧭 Architecture
 ```
