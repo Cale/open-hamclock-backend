@@ -2,6 +2,7 @@
 
 # at release time, this value is set to the tagged release
 OHB_MANAGER_VERSION=latest
+GITHUB_LATEST_RELEASE_URL="https://api.github.com/repos/BrianWilkinsFL/open-hamclock-backend/releases/latest"
 
 OHB_HTDOCS_DVC=ohb-htdocs
 IMAGE_BASE=komacke/open-hamclock-backend
@@ -82,6 +83,9 @@ main() {
         add-env-file)
             shift && get_compose_opts "$@"
             copy_env_to_container
+            ;;
+        upgrade-me)
+            upgrade_this_script
             ;;
         *)
             echo "Invalid or missing option. Try using '$THIS help'."
@@ -209,6 +213,57 @@ STICKY_DASHBOARD_INSTALL="$ENABLE_DASHBOARD"
 STICKY_LIGHTTPD_ENV_FILE="$ENV_FILE"
 STICKY_EXTERNAL_HTTP_LOG="$ENABLE_EXTERNAL_HTTP_LOG"
 EOF
+}
+
+upgrade_this_script() {
+    CHECK_LATEST_JSON=$(curl -s "$GITHUB_LATEST_RELEASE_URL")
+    URL_LATEST_THIS=$(echo "$CHECK_LATEST_JSON" | jq -r ".assets[] | select(.browser_download_url | contains(\"$DOCKER_PROJECT\")) | .browser_download_url")
+    DIGEST_LATEST_THIS=$(echo "$CHECK_LATEST_JSON" | jq -r ".assets[] | select(.browser_download_url | contains(\"$DOCKER_PROJECT\")) | .digest")
+
+    URL_LATEST_RELEASE=$(echo "$CHECK_LATEST_JSON" | jq -r '.html_url')
+    AVAILABLE_VERSION=$(basename "$URL_LATEST_RELEASE")
+
+    if [ "$AVAILABLE_VERSION" == "$OHB_MANAGER_VERSION" ]; then
+        echo "$THIS is currently the latest version: '$OHB_MANAGER_VERSION'"
+        return 0
+    fi
+    cat <<EOF
+There is a new version: '$AVAILABLE_VERSION'. The version you have is '$OHB_MANAGER_VERSION'.
+
+Source and release notes can be found at this URL:
+
+  $URL_LATEST_RELEASE
+
+Would you like to download the latest version of $THIS and overwrite your current copy?
+EOF
+
+    DEFAULT_DOIT=y
+    read -p "Overwrite? [Y/n]: " DOIT
+    DOIT=${DOIT:-$DEFAULT_DOIT}
+
+    echo
+    if [ "${DOIT,,}" == y ]; then
+        echo "Getting new version ..."
+        TMP_MGR_FILE=$(mktemp -p ./)
+        curl -sLo $TMP_MGR_FILE $URL_LATEST_THIS
+        chmod --reference=$THIS $TMP_MGR_FILE
+
+        DIGEST_FILE=sha256:$(sha256sum $TMP_MGR_FILE | cut -d ' ' -f1)
+        if [ "$DIGEST_FILE" == "$DIGEST_LATEST_THIS" ]; then
+            echo "Successfully downloaded new version. Let's run it and check its version:"
+            echo
+            echo "$ ./$THIS"
+            mv $TMP_MGR_FILE $THIS
+            exec "./$THIS" version
+        else
+            echo
+            echo "ERROR: downloaded file '$TMP_MGR_FILE' seems to be corrupted. Not using it."
+            echo "  Expected: '$DIGEST_LATEST_THIS'"
+            echo "  Got:      '$DIGEST_FILE'"
+        fi
+    else
+        echo "Because you answered '$DOIT', we won't upgrade and overwrite. 'Y' or 'y' will do the upgrade."
+    fi
 }
 
 install_ohb() {
