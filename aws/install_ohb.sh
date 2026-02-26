@@ -531,7 +531,7 @@ run_sh  gen_contest-calendar.sh
 run_python kindex_simple.py
 run_sh  update_cloud_maps.sh
 run_sh  update_drap_maps.sh
-run_sh  gen_dst.sh
+run_python  dst_simple.py
 run_sh  fetch_tle.sh
 run_sh  gen_aurora.sh
 run_sh  gen_noaaswx.sh
