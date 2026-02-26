@@ -1,3 +1,5 @@
 # .gitignore
 # don't include these files in the git repo
 *.env
+ohb-maps.tar.zst
+dvoacap.tgz

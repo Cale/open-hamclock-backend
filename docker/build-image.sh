@@ -85,6 +85,7 @@ do_all() {
     warn_image_tag
     warn_local_edits
     get_dvoacap
+    get_maps
     build_image
 }
 
@@ -131,6 +132,14 @@ get_dvoacap() {
         echo
         echo "Getting dvoacap-python from GitHub ..."
         curl -fsSL https://github.com/skyelaird/dvoacap-python/archive/refs/heads/main.tar.gz -o dvoacap.tgz
+    fi
+}
+
+get_maps() {
+    if [ ! -e ohb-maps.tar.zst ]; then
+        echo
+        echo "Getting ohb-maps from GitHub ..."
+        curl -fsSLO https://github.com/BrianWilkinsFL/open-hamclock-backend/releases/download/maps-v1/ohb-maps.tar.zst
     fi
 }
 
