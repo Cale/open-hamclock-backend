@@ -6,6 +6,7 @@ set -euo pipefail
 
 export GMT_USERDIR=/opt/hamclock-backend/tmp
 cd "$GMT_USERDIR"
+source /opt/hamclock-backend/venv/bin/activate
 
 source "/opt/hamclock-backend/scripts/lib_sizes.sh"
 ohb_load_sizes
@@ -143,14 +144,14 @@ for SZ in "${SIZES[@]}"; do
   J="Q0/${W_IN}i"
 
   gmt begin "$BASE" png E100
-    gmt set MAP_FRAME_TYPE=plain
+    gmt set MAP_FRAME_TYPE=plain MAP_FRAME_WIDTH=0p MAP_FRAME_PEN=0p,white
     # Black base
-    gmt coast -R${R} -J${J} -Gblack -Sblack -B0 -Dc
+    gmt coast -R${R} -J${J} -Gblack -Sblack -Dc --MAP_FRAME_PEN=0p
     # MUF heatmap
     gmt grdimage mufd.grd -R${R} -J${J} -C${CPT} -Q
     # Day white veil (D maps only)
     if [[ "$DN" == "D" ]]; then
-      gmt coast -R${R} -J${J} -Gwhite -Swhite -B0 -Dc -t80
+      gmt coast -R${R} -J${J} -Gwhite -Swhite -Dc -t80 --MAP_FRAME_PEN=0p
     fi
     # Coastlines + borders
     gmt coast -R${R} -J${J} -W${COAST_PT}p,black -N1/${BORDER_PT}p,black -Dc
