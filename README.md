@@ -31,6 +31,7 @@ These steps let you point a HamClock (or any client) at a shared OHB test server
 Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
 
 ### /etc/hosts file modification
+The original vision of OHB was to use a 'DNS sinkhole' concept. This will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. 
 
 ```sudo nano /etc/hosts```
 
