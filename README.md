@@ -56,7 +56,7 @@ Finally, you should be able to ping the re-directed host
 
 ```ping -c 5 clearskyinstitute.com```
 
-It should say 100%
+It should say 100% and you should be able to restart your hamclock to connect to ohb.hamclock.app.
 
 ### -b option
 
