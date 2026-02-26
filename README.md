@@ -100,8 +100,6 @@ and if hamclock is installed in your PATH on the system then it will tell you wh
          +----------+
 ```
 ## Compatibility 👉 [Compatibility](COMPATIBILITY.md)
-
-See 
 ## 💬 Join us on Discord
 We are building a community-powered backend to keep HamClock running. \
 Discord is where we can collaborate, troubleshoot, and exchange ideas — no RF license required 😎 \
