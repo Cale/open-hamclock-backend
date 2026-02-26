@@ -38,7 +38,9 @@ cat /dev/null > $SOURCE_FILE.tmp
 while IFS= read -r line || [[ -n "$line" ]]; do
     KEEP_FILE=yes
     OUT_FILE=${OUT}${line}
-    if [ -e $OUT_FILE -a -e $OUT_FILE.md5 ]; then
+    if [[ ! "$line" =~ ^/ham/HamClock/ ]]; then
+        KEEP_FILE=no
+    elif [ -e $OUT_FILE -a -e $OUT_FILE.md5 ]; then
         LAST_MD5="$(cat $OUT_FILE.md5)"
         CURRENT_MD5="$(stat -c "%a %u %g %s %Y" $OUT_FILE | md5sum)"
         if [ "$LAST_MD5" != "$CURRENT_MD5" ]; then
