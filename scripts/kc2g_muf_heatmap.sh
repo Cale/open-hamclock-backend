@@ -6,7 +6,11 @@ set -euo pipefail
 
 export GMT_USERDIR=/opt/hamclock-backend/tmp
 cd "$GMT_USERDIR"
-source /opt/hamclock-backend/venv/bin/activate
+
+PYTHON_BIN="/opt/hamclock-backend/venv/bin/python3"
+if [ ! -x "$PYTHON_BIN" ]; then
+    PYTHON_BIN="/usr/bin/python3"
+fi
 
 source "/opt/hamclock-backend/scripts/lib_sizes.sh"
 ohb_load_sizes
