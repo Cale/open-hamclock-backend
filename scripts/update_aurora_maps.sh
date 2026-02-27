@@ -99,7 +99,6 @@ export MAGICK_LIMIT_AREA=4096MB
 export MAGICK_LIMIT_MEMORY=2048MB
 export MAGICK_LIMIT_MAP=4096MB
 export MAGICK_LIMIT_DISK=8192MB
-
 im_convert() {
   convert \
     -limit width    65536  \
@@ -125,35 +124,49 @@ for SZ in "${SIZES[@]}"; do
 
   W=${SZ%x*}
   H=${SZ#*x}
-  # Render at 2x width for quality, then resize down — same as original
-  W2=$((W * 2))
+  # For sizes where 2x would exceed ~8000px, render at 1x to avoid GMT/libpng
+  # internal width limits. For smaller sizes use 2x for quality then resize down.
+  MAX_RENDER=7000
+  if (( W * 2 > MAX_RENDER )); then
+    RENDER_W=$W
+    RENDER_H=$H
+  else
+    RENDER_W=$((W * 2))
+    RENDER_H=$((H * 2))
+  fi
 
   echo "  -> ${DN} ${SZ}"
 
-  gmt begin "$BASE" png
-    gmt set \
-      MAP_FRAME_TYPE plain \
-      MAP_FRAME_AXES "" \
-      MAP_FRAME_PEN 0p \
-      MAP_GRID_PEN_PRIMARY 0p \
-      MAP_GRID_PEN_SECONDARY 0p \
-      MAP_GRID_CROSS_SIZE_PRIMARY 0p \
-      MAP_GRID_CROSS_SIZE_SECONDARY 0p
-    gmt coast -R-180/180/-90/90 -JQ0/${W2}p -G0/0/0 -S0/0/0 -A10000 --MAP_FRAME_AXES=
-    if [[ "$DN" == "D" ]]; then
-      gmt coast -R-180/180/-90/90 -JQ0/${W2}p -G72/72/72 -S72/72/72 -A10000 --MAP_FRAME_AXES=
-    fi
-    gmt grdimage aurora_clipped.nc -R-180/180/-90/90 -JQ0/${W2}p -Caurora.cpt -Q -n+b --MAP_FRAME_AXES=
-    gmt coast -R-180/180/-90/90 -JQ0/${W2}p -W0.75p,white -N1/0.5p,white -A10000 --MAP_FRAME_AXES=
-  gmt end || { echo "gmt failed for $SZ"; continue; }
+  # Use classic PS pipeline — avoids gmt begin/end producing a PNG that
+  # im_convert cannot read due to libpng width limits at large sizes.
+  PS="${BASE}.ps"
+  W_cm=$(awk "BEGIN{printf \"%.4f\", $RENDER_W * 2.54 / 72}")
+  H_cm=$(awk "BEGIN{printf \"%.4f\", $RENDER_H * 2.54 / 72}")
+  GMT_CONF="$GMT_USERDIR/gmtconf_aurora_${DN}_${SZ}"
+  mkdir -p "$GMT_CONF"
+  GMT_USERDIR="$GMT_CONF" gmt set     PS_MEDIA "${W_cm}cx${H_cm}c"     MAP_ORIGIN_X 0c     MAP_ORIGIN_Y 0c
 
-  # Use im_convert with raised limits for the resize — this is the only fix needed
+  (
+    cd "$GMT_USERDIR" || exit 1
+    if [[ "$DN" == "D" ]]; then
+      FILL="74/73/74"
+    else
+      FILL="0/0/0"
+    fi
+    GMT_USERDIR="$GMT_CONF"     gmt pscoast -R-180/180/-90/90 -JQ0/${RENDER_W}p -G${FILL} -S${FILL} -A10000       --MAP_FRAME_AXES= -P -K > "$PS"
+    GMT_USERDIR="$GMT_CONF"     gmt grdimage aurora_clipped.nc -R-180/180/-90/90 -JQ0/${RENDER_W}p       -Caurora.cpt -Q -n+b --MAP_FRAME_AXES= -O -K >> "$PS"
+    GMT_USERDIR="$GMT_CONF"     gmt pscoast -R-180/180/-90/90 -JQ0/${RENDER_W}p       -W1.25p,white -N1/1.10p,white -A10000 --MAP_FRAME_AXES= -O -K >> "$PS"
+    gmt psxy -R -J -T -O >> "$PS"
+    # Rasterize PS -> PNG via Ghostscript (bypasses libpng width limits entirely)
+    gs -dBATCH -dNOPAUSE -dSAFER -dQUIET        -sDEVICE=png16m        -r72        -dDEVICEWIDTHPOINTS=${RENDER_W}        -dDEVICEHEIGHTPOINTS=${RENDER_H}        -sOutputFile="$PNG"        "$PS"
+  ) || { echo "gmt/gs failed for ${DN} $SZ" >&2; continue; }
+
   im_convert "$PNG" -filter Lanczos -resize "${SZ}!" "$PNG_FIXED" || { echo "resize failed for $SZ"; continue; }
 
   RAW="$GMT_USERDIR/aurora_${DN}_${SZ}.raw"
   im_convert "$PNG_FIXED" RGB:"$RAW" || { echo "raw extract failed for $SZ"; continue; }
   make_bmp_v4_rgb565_topdown "$RAW" "$BMP" "$W" "$H" || { echo "bmp write failed for $SZ"; continue; }
-  rm -f "$RAW" "$PNG" "$PNG_FIXED"
+  rm -f "$RAW" "$PNG" "$PNG_FIXED" "$PS"
 
   zlib_compress "$BMP" "${BMP}.z"
   chmod 0644 "$BMP" "${BMP}.z" 2>/dev/null || true
