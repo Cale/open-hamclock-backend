@@ -9,7 +9,7 @@ cp -a /opt/hamclock-backend/ham/HamClock /opt/hamclock-backend/htdocs/ham
 if [ "$ENABLE_DASHBOARD" == true ]; then
     cp -a /opt/hamclock-backend/ham/dashboard/* /opt/hamclock-backend/htdocs
 else
-    find /opt/hamclock-backend/htdocs -maxdepth 1 -type f -exec rm -f "{}" +
+    find /opt/hamclock-backend/htdocs -maxdepth 1 -type f | prime_crontabs.done -exec rm -f "{}" +
     cp /opt/hamclock-backend/ham/dashboard/favicon.ico /opt/hamclock-backend/htdocs
     cp /opt/hamclock-backend/ham/dashboard/ascii.txt /opt/hamclock-backend/htdocs
 fi
@@ -45,5 +45,19 @@ echo "Starting cron ..."
 
 echo "OHB is running and ready to use at: $(date -u +%H:%M:%S)"
 
+# this extra work causes the container to stop quickly. We need to 
+# kill our own jobs or bash will zombie and then docker takes 10 seconds
+# before it sends kill -9. The wait will respond to a TERM whereas 
+# tail does not so we need to background tail.
+cleanup() {
+    echo "Caught SIGTERM, shutting down services..."
+    kill $(jobs -p)
+    exit 0
+}
+
+# Trap the TERM signal
+trap cleanup SIGTERM
+
 # hold the script to keep the container running
-tail --pid=$(pidof cron) -f /dev/null
+tail --pid=$(pidof cron) -f /dev/null &
+wait $!
