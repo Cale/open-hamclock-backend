@@ -13,7 +13,7 @@ You haven't used docker before? Now's your chance! It's not hard and it's great 
 To get OHB to run in docker on your machine, you'll need to:
 - install docker on your machine (some distributions like Ubuntu 24.04 install very old docker so you might need to set up the docker repository)
 - get the OHB manager for docker
-- launch the container with the OHB manager
+- launch the docker container using the OHB manager
 
 ## Where are the docker images?
 
@@ -138,17 +138,17 @@ Upgrading OHB is easy.
 ## versions starting with v0.24
 If your manager utility version is 0.24 or later, it can upgrade itself.
 ```
-./manager-ohb-docker.sh version
+./manage-ohb-docker.sh version
 ```
 
 This is how to self-upgrade the utility:
 ```
-./manager-ohb-docker.sh upgrade-me
+./manage-ohb-docker.sh upgrade-me
 ```
 
 If it shows the latest version at the end, then use it to upgrade OHB:
 ```
-./manager-ohb-docker.sh upgrade
+./manage-ohb-docker.sh upgrade
 ```
 
 ## versions v0.23 and older
