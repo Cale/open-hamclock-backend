@@ -13,25 +13,41 @@ my $TLE_IN    = $ENV{ESATS_TLE_CACHE} // "/opt/hamclock-backend/tle/tles.txt";
 my $TLE_OUT   = $ENV{ESATS_OUT}       // "/opt/hamclock-backend/htdocs/ham/HamClock/esats/esats.txt";
 
 # AMSAT name => { tle => Celestrak name, out => friendly output name }
-# Only needed when AMSAT and Celestrak names differ.
+# Keys are uppercased. Only needed when AMSAT and Celestrak names differ,
+# or when the AMSAT page uses mode-suffixed names (e.g. "AO-7 [U/V]").
 # 'out' is what gets written to esats.txt.
 my %ALIAS = (
-    'AO-123'            => { tle => 'ASRTU-1 (AO-123)',      out => 'AO-123'            },
-    'AO-73'             => { tle => 'FUNCUBE-1 (AO-73)',      out => 'AO-73'             },
-    'AO-7[A]'           => { tle => 'OSCAR 7 (AO-7)',         out => 'AO-7'              },
-    'AO-7[B]'           => { tle => 'OSCAR 7 (AO-7)',         out => 'AO-7'              },
-    'AO-85'             => { tle => 'FOX-1A (AO-85)',         out => 'AO-85'             },
-    'BOTAN APRS'        => { tle => 'BOTAN',                  out => 'BOTAN'             },
-    'CatSat'            => { tle => 'CATSAT',                 out => 'CATSAT'            },
-    'ISS-DATA'          => { tle => 'ISS (ZARYA)',             out => 'ISS'               },
-    'ISS-FM'            => { tle => 'ISS (ZARYA)',             out => 'ISS'               },
-    'JO-97'             => { tle => 'JY1SAT (JO-97)',         out => 'JO-97'             },
-    'QMR-KWT-2_(RS95S)' => { tle => 'QMR-KWT-2 (RS95S)',     out => 'QMR-KWT-2 (RS95S)' },
-    'QO-100_NB'         => { tle => '',                       out => ''                  },
-    'RS-44'             => { tle => 'RS-44 & BREEZE-KM R/B',  out => 'RS-44'             },
-    'SO-125'            => { tle => 'HADES-ICM',              out => 'SO-125'            },
-    'SO-50'             => { tle => 'SAUDISAT 1C (SO-50)',    out => 'SO-50'             },
-    'SONATE-2 APRS'     => { tle => 'SONATE-2',               out => 'SONATE-2'          },
+    # Standard aliases (AMSAT name differs from Celestrak name)
+    'AO-10'             => { tle => 'PHASE 3B (AO-10)',       out => 'AO-10'   },
+    'AO-123'            => { tle => 'ASRTU-1 (AO-123)',       out => 'AO-123'  },
+    'AO-27'             => { tle => 'EYESAT A (AO-27)',       out => 'AO-27'   },
+    'AO-73'             => { tle => 'FUNCUBE-1 (AO-73)',       out => 'AO-73'   },
+    'AO-7'              => { tle => 'OSCAR 7 (AO-7)',          out => 'AO-7'    },
+    'AO-7[A]'           => { tle => 'OSCAR 7 (AO-7)',          out => 'AO-7'    },
+    'AO-7[B]'           => { tle => 'OSCAR 7 (AO-7)',          out => 'AO-7'    },
+    'AO-85'             => { tle => 'FOX-1A (AO-85)',          out => 'AO-85'   },
+    'AO-91'             => { tle => 'RADFXSAT (FOX-1B)',       out => 'AO-91'   },
+    'AO-95'             => { tle => 'FOX-1CLIFF (AO-95)',      out => 'AO-95'   },
+    'BOTAN APRS'        => { tle => 'BOTAN',                   out => 'BOTAN'   },
+    'CATSAT'            => { tle => 'CATSAT',                  out => 'CATSAT'  },
+    'ISS'               => { tle => 'ISS (ZARYA)',             out => 'ISS'     },
+    'ISS-DATA'          => { tle => 'ISS (ZARYA)',             out => 'ISS'     },
+    'ISS-FM'            => { tle => 'ISS (ZARYA)',             out => 'ISS'     },
+    'ISS APRS'          => { tle => 'ISS (ZARYA)',             out => 'ISS'     },
+    'ISS FM'            => { tle => 'ISS (ZARYA)',             out => 'ISS'     },
+    'JO-97'             => { tle => 'JY1SAT (JO-97)',          out => 'JO-97'   },
+    'QMR-KWT-2 (RS95S)' => { tle => 'QMR-KWT-2 (RS95S)',      out => 'RS95S'   },
+    'QMR-KWT-2_(RS95S)' => { tle => 'QMR-KWT-2 (RS95S)',      out => 'RS95S'   },
+    'QO-100 NB'         => { tle => '',                        out => ''        },
+    'QO-100_NB'         => { tle => '',                        out => ''        },
+    'RS-44'             => { tle => 'RS-44 & BREEZE-KM R/B',  out => 'RS-44'   },
+    'RS95S'             => { tle => 'QMR-KWT-2 (RS95S)',       out => 'RS95S'   },
+    'RS95S SSTV'        => { tle => 'QMR-KWT-2 (RS95S)',       out => 'RS95S'   },
+    'RS18S SSTV'        => { tle => '',                        out => ''        },  # not in Celestrak feeds
+    'SO-125'            => { tle => 'HADES-ICM',               out => 'SO-125'  },
+    'SO-50'             => { tle => 'SAUDISAT 1C (SO-50)',     out => 'SO-50'   },
+    'SONATE-2 APRS'     => { tle => 'SONATE-2',                out => 'SONATE-2'},
+    'SONATE-2'          => { tle => 'SONATE-2',                out => 'SONATE-2'},
 );
 
 # --- Fetch AMSAT status page ---
@@ -53,7 +69,6 @@ while ($html =~ m{<tr[^>]*>\s*<td[^>]*>\s*(?:<a[^>]*>)?([^<]+?)(?:</a>)?\s*</td>
     my $cells    = $2;
     $sat_name =~ s/^\s+|\s+$//g;
 
-    # Check only the first 12 td cells (today's columns)
     my @tds;
     while ($cells =~ m{<td([^>]*)>.*?</td>}gsi && @tds < 60) {
         push @tds, $1;
@@ -66,17 +81,26 @@ while ($html =~ m{<tr[^>]*>\s*<td[^>]*>\s*(?:<a[^>]*>)?([^<]+?)(?:</a>)?\s*</td>
 
     next unless $has_status;
 
-    my $uname = uc($sat_name);
+    # Strip trailing mode/band suffix like " [U/V]", " [FM]", " [APRS]", " [SSTV]", " SSTV", etc.
+    # The AMSAT page often has one row per mode; we just need the base satellite name.
+    (my $base_name = $sat_name) =~ s/\s*[\[({][\w\/\s]+[\])}]\s*$//;
+    $base_name =~ s/\s+$//;
 
-    if (exists $ALIAS{$uname} || exists $ALIAS{$sat_name}) {
-        # Look up using original or uppercased key
-        my $entry = $ALIAS{$uname} // $ALIAS{$sat_name};
+    # Try both original and base name for alias lookup (uppercased)
+    my $uname      = uc($sat_name);
+    my $ubase      = uc($base_name);
+
+    my $entry =   $ALIAS{$uname}
+               // $ALIAS{$ubase}
+               // $ALIAS{$sat_name}
+               // $ALIAS{$base_name};
+
+    if (defined $entry) {
         next if !$entry->{tle} || $entry->{tle} eq '';
-        # Map Celestrak TLE name -> friendly output name
         $active{uc($entry->{tle})} = $entry->{out};
     } else {
-        # No alias — Celestrak name matches AMSAT name, use as-is
-        $active{$uname} = $sat_name;
+        # No alias — use base name; Celestrak name should match
+        $active{$ubase} = $base_name;
     }
 }
 
@@ -128,4 +152,4 @@ while ($i < @lines) {
 }
 
 close $out;
-print STDERR "Wrote $written blocks to $TLE_OUT\n";
+print STDERR "Wrote $written blocks to $TLE_OUT (from $found resolved TLE keys)\n";
