@@ -1,8 +1,11 @@
-# 🛟 OHB — Open HamClock Backend
+# 🛟  📡 OHB — Open HamClock Backend
 
 When the original backend went dark, the clocks didn’t have to.
 
-Open-source, self-hostable backend replacement for HamClock — restoring live propagation data, maps, and feeds.
+🔁 [HamClock Is Not Dead](http://hamclockisnotdead.com)
+
+
+🧱 Open-source, self-hostable backend replacement for HamClock — restoring live propagation data, maps, and feeds.
 
 What's a backend? It is how HamClock got all of its data. Without a separate backend, all HamClock's will cease to function by June 2026.
 
@@ -15,7 +18,7 @@ that HamClock depends on — built by operators, for operators.
 > Elwood Downey, WB0OEW.
 > We extend our sincere condolences to the Downey family.
 
-## ✨ What OHB Does
+## ⚙️ What OHB Does
 
 - Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc)
 - Generates map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.)
@@ -26,7 +29,7 @@ that HamClock depends on — built by operators, for operators.
 - Command and Control Dashboard (future)
 - Runs in Raspberry Pi 4, 5, PC, Virtual Machine, Bare Metal or Cloud
   
-## OHB Central Server (testing)
+## 🧱 OHB Central Server (testing)
 These steps let you point a HamClock (or any client) at a shared OHB test server without self-hosting. This is a local-only change on your machine and is easy to revert.
 
 This is a test server and may be subject to unannounced or unplanned updates. 
