@@ -79,6 +79,9 @@ and if hamclock is installed in your PATH on the system then it will tell you wh
 
 /path/to/hamclock may vary on your system
 
+### Transitioning? Be sure to clear your .hamclock cache
+For users transitioning immediately from ClearSkyInstitute or another backend server, it is important that you clear these two file types to ensure you pull latest upon connecting to either your local backend or the central backend. This involves deleting *.bmp and *.txt from your .hamclock cache directory. Do not delete the eeprom file or you will lose your settings. 
+
 ## 🧭 Architecture
 ```
 [ NOAA / KC2G / PSK / SWPC ]
