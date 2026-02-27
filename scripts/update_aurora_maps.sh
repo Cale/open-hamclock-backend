@@ -149,13 +149,13 @@ for SZ in "${SIZES[@]}"; do
   (
     cd "$GMT_USERDIR" || exit 1
     if [[ "$DN" == "D" ]]; then
-      FILL="72/72/72"
+      FILL="74/73/74"
     else
       FILL="0/0/0"
     fi
     GMT_USERDIR="$GMT_CONF"     gmt pscoast -R-180/180/-90/90 -JQ0/${RENDER_W}p -G${FILL} -S${FILL} -A10000       --MAP_FRAME_AXES= -P -K > "$PS"
     GMT_USERDIR="$GMT_CONF"     gmt grdimage aurora_clipped.nc -R-180/180/-90/90 -JQ0/${RENDER_W}p       -Caurora.cpt -Q -n+b --MAP_FRAME_AXES= -O -K >> "$PS"
-    GMT_USERDIR="$GMT_CONF"     gmt pscoast -R-180/180/-90/90 -JQ0/${RENDER_W}p       -W0.75p,white -N1/0.5p,white -A10000 --MAP_FRAME_AXES= -O -K >> "$PS"
+    GMT_USERDIR="$GMT_CONF"     gmt pscoast -R-180/180/-90/90 -JQ0/${RENDER_W}p       -W1.25p,white -N1/1.10p,white -A10000 --MAP_FRAME_AXES= -O -K >> "$PS"
     gmt psxy -R -J -T -O >> "$PS"
     # Rasterize PS -> PNG via Ghostscript (bypasses libpng width limits entirely)
     gs -dBATCH -dNOPAUSE -dSAFER -dQUIET        -sDEVICE=png16m        -r72        -dDEVICEWIDTHPOINTS=${RENDER_W}        -dDEVICEHEIGHTPOINTS=${RENDER_H}        -sOutputFile="$PNG"        "$PS"
