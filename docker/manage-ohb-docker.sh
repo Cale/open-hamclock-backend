@@ -625,6 +625,10 @@ determine_http_log() {
         ENABLE_EXTERNAL_HTTP_LOG=$DEFAULT_EXTERNAL_HTTP_LOG
 
     fi
+
+    if [ "$ENABLE_EXTERNAL_HTTP_LOG" == true ]; then
+        ENABLE_EXTERNAL_HTTP_LOG_LINE="- $HERE/logs/lighttpd:/var/log/lighttpd:rw"
+    fi
 }
 
 determine_tag() {
@@ -678,7 +682,7 @@ docker_compose_yml() {
             sed "s/__CONTAINER__/$CONTAINER/" |
             sed "s/__HTTP_PORT__/$HTTP_PORT/" |
             sed "s/__ENABLE_DASHBOARD__/$ENABLE_DASHBOARD/" |
-            sed "s|__ENABLE_EXTERNAL_HTTP_LOG__|- $HERE/logs/lighttpd:/var/log/lighttpd:rw|"
+            sed "s|__ENABLE_EXTERNAL_HTTP_LOG__|$ENABLE_EXTERNAL_HTTP_LOG_LINE|"
     )
 }
 
