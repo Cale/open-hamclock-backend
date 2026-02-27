@@ -12,7 +12,7 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 - [x] ssn/ssn-history.txt
 - [x] solar-flux/solarflux-99.txt
 - [x] geomag/kindex.txt
-- [ ] dst/dst.txt - proxied by CSI until we can work out kinks
+- [x] dst/dst.txt
 - [x] drap/stats.txt
 - [x] solar-wind/swind-24hr.txt
 - [x] ssn/ssn-31.txt
