@@ -79,11 +79,11 @@ CRON_TZ=UTC
 */30 * * * * flock -n /tmp/update_sdo.lock /opt/hamclock-backend/scripts/update_all_sdo.sh >> /opt/hamclock-backend/logs/update_all_sdo.log 2>&1
 
 # maps
-*/15 * * * * /opt/hamclock-backend/scripts/kc2g_muf_heatmap.sh >> /opt/hamclock-backend/logs/kc2g_muf_heatmap.log 2>&1
-0 */3 * * * /opt/hamclock-backend/scripts/update_cloud_maps.sh >> /opt/hamclock-backend/logs/update_cloud_maps.log 2>&1
-7,37 * * * * /opt/hamclock-backend/scripts/update_drap_maps.sh >> /opt/hamclock-backend/logs/update_drap_maps.log 2>&1
-6,30 * * * * /opt/hamclock-backend/scripts/update_aurora_maps.sh >> /opt/hamclock-backend/logs/update_aurora_maps.log 2>&1
-0 0,12 * * * /opt/hamclock-backend/scripts/update_wx_mb_maps.sh >> /opt/hamclock-backend/logs/update_wx_mb_maps.log 2>&1
+10,40 * * * *          /opt/hamclock-backend/scripts/kc2g_muf_heatmap.sh    >> /opt/hamclock-backend/logs/kc2g_muf_heatmap.log   2>&1
+20 */3 * * *           /opt/hamclock-backend/scripts/update_cloud_maps.sh   >> /opt/hamclock-backend/logs/update_cloud_maps.log  2>&1
+35 * * * *             /opt/hamclock-backend/scripts/update_drap_maps.sh    >> /opt/hamclock-backend/logs/update_drap_maps.log   2>&1
+5 1,5,9,13,17,21 * * * /opt/hamclock-backend/scripts/update_aurora_maps.sh  >> /opt/hamclock-backend/logs/update_aurora_maps.log 2>&1
+0 0,12 * * *           /opt/hamclock-backend/scripts/update_wx_mb_maps.sh   >> /opt/hamclock-backend/logs/update_wx_mb_maps.log  2>&1
 
 */5 * * * * OPENMETEO_CHUNK=50 OPENMETEO_REQS_PER_RUN=1 /usr/bin/perl /opt/hamclock-backend/scripts/update_world_wx.pl >>/opt/hamclock-backend/logs/worldwx.log 2>&1
 
