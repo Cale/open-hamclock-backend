@@ -26,7 +26,7 @@ my %ALIAS = (
     'ISS-DATA'          => { tle => 'ISS (ZARYA)',             out => 'ISS'               },
     'ISS-FM'            => { tle => 'ISS (ZARYA)',             out => 'ISS'               },
     'JO-97'             => { tle => 'JY1SAT (JO-97)',         out => 'JO-97'             },
-    'QMR-KWT-2_(RS95S)' => { tle => 'QMR-KWT-2 (RS95S)',     out => 'QMR-KWT-2 (RS95S)' },
+    'QMR-KWT-2_(RS95S)' => { tle => 'QMR-KWT-2 (RS95S)',     out => 'RS95S' },
     'QO-100_NB'         => { tle => '',                       out => ''                  },
     'RS-44'             => { tle => 'RS-44 & BREEZE-KM R/B',  out => 'RS-44'             },
     'SO-125'            => { tle => 'HADES-ICM',              out => 'SO-125'            },
