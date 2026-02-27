@@ -28,10 +28,11 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] maps/Clouds*
 - [x] maps/Countries*
 - [x] maps/Wx-mB*
+- [ ] maps/Wx-in*
 - [x] maps/Aurora
-- [x] maps/DRAP
-- [x] maps/MUF-RT
-- [x] maps/Terrain
+- [x] maps/DRAP*
+- [x] maps/MUF-RT*
+- [x] maps/Terrain*
 - [x] SDO/*
 
 ### Dynamic Web Endpoints
