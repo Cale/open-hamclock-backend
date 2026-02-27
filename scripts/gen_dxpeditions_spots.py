@@ -28,7 +28,7 @@ from lxml import html as lxml_html
 # ---------------------------------------------------------------------------
 
 OUT_FILE  = Path('/opt/hamclock-backend/htdocs/ham/HamClock/dxpeds/dxpeditions.txt')
-LOCK_FILE = Path('/tmp/gen_dxpeditions.lock')
+LOCK_FILE = Path('/opt/hamclock-backend/tmp/gen_dxpeditions.lock')
 
 NG3K_URL   = 'https://www.ng3k.com/Misc/adxo.html'
 DXNEWS_IDX = 'https://dxnews.com/dxpeditions/'
@@ -44,7 +44,7 @@ DXNEWS_DELAY    = 0.5  # seconds between DXNews page fetches
 
 HEADERS = {
     'User-Agent': (
-        'HamClock-DXPeds/2.0 '
+        'OHB-DXPeds/2.0 '
         '(+https://github.com/BrianWilkinsFL/open-hamclock-backend)'
     )
 }
