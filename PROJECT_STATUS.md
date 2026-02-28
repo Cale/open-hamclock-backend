@@ -1,6 +1,6 @@
 ## Project Completion Status
 
-HamClock requests about 40+ artifacts. I have locally replicated all of them that I could find.
+Each supporting file type has a data generation script. These scripts operate on a schedule that is defined in a [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab). 
 
 ### Dynamic Text Files
 - [x] [Bz/Bz.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/bz_simple.py)
