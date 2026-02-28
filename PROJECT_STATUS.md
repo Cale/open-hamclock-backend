@@ -25,32 +25,32 @@ HamClock requests about 40+ artifacts. I have locally replicated all of them tha
 ### Dynamic Map Files
 Note: Anything under maps/ is considered a "Core Map" in HamClock
 
-- [x] maps/Clouds*
-- [x] maps/Countries*
-- [x] maps/Wx-mB*
-- [x] maps/Wx-in*
-- [x] maps/Aurora
-- [x] maps/DRAP*
-- [x] maps/MUF-RT*
-- [x] maps/Terrain*
-- [x] SDO/*
+- [x] [maps/Clouds*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_cloud_maps.sh)
+- [x] maps/Countries* - reuse from CSI; no need to regenerate
+- [x] [maps/Wx-mB*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh)
+- [x] [maps/Wx-in*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh)
+- [x] [maps/Aurora](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_aurora_maps.sh)
+- [x] [maps/DRAP*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_drap_maps.sh)
+- [x] [maps/MUF-RT*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/kc2g_muf_heatmap.sh)
+- [x] maps/Terrain* - reuse from CSI; no need to regenerate
+- [x] [SDO/*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_all_sdo.sh)
 
 ### Dynamic Web Endpoints
-- [x] ham/HamClock/RSS/web15rss.pl
-- [x] ham/HamClock/version.pl
-- [x] ham/HamClock/wx.pl
-- [x] ham/HamClock/fetchIPGeoloc.pl - requires free tier 1000 req per day account and API key
-- [x] ham/HamClock/fetchBandConditions.pl
+- [x] [ham/HamClock/RSS/web15rss.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/RSS/web15rss.pl) and this [job](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/web15rss_fetch.py) makes the file
+- [x] [ham/HamClock/version.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/version.pl)
+- [x] [ham/HamClock/wx.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/wx.pl)
+- [x] [ham/HamClock/fetchIPGeoloc.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/fetchIPGeoloc.pl) - requires free tier 1000 req per day account and API key
+- [ ] ham/HamClock/fetchBandConditions.pl - implemented however bypassed via proxied
 - [ ] ham/HamClock/fetchVOACAPArea.pl - proxied by CSI until we can work out complex task
 - [ ] ham/HamClock/fetchVOACAP-MUF.pl - proxied by CSI until we can work out complex task
 - [ ] ham/HamClock/fetchVOACAP-TOA.pl - proxied by CSI until we can work out complex task
 - [ ] ham/HamClock/fetchPSKReporter.pl - currently proxied, it is implemented however it will be subject to rate limiting if deployed centrally. I have created a PSK Reporter proxy as of last week (https://github.com/BrianWilkinsFL/ohb-pskreporter-proxy)
-- [x] ham/HamClock/fetchWSPR.pl
-- [x] ham/HamClock/fetchRBN.pl
+- [x] [ham/HamClock/fetchWSPR.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/fetchWSPR.pl)
+- [x] [ham/HamClock/fetchRBN.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/fetchRBN.pl)
 
 ### Static Files
-- [x] ham/HamClock/cities2.txt
-- [x] ham/HamClock/NOAASpaceWx/rank2_coeffs.txt
+- [x] ham/HamClock/cities2.txt - we did not update this file as it appears to require no change
+- [x] ham/HamClock/NOAASpaceWx/rank2_coeffs.txt - we did not update this file as it appears to require no change
 
 ## Integration Testing Status
 - [x] GOES-16 X-Ray
