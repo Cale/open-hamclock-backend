@@ -22,9 +22,9 @@ All maps are generated on your own self hosted hardware. VOACAP is in work.
 
 ## ⚙️ What OHB Does
 
-- Eliminates dependency on CSI (VOACAP and PskReporter is in work)
+- Implements a self-hosted backend compatible with the HamClock backend interface
 - Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc) all on your own hardware
-- Generates faithful CSI-style map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.) Note: maps may vary due to differences that are unknown and inaccesible to us
+- Generates faithful HamClock-style map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.) Note: Maps may vary slightly due to upstream model differences
 - Produces zlib-compressed BMP assets in multiple resolutions using the same specialized, RGB top down approach that is required by HamClock
 - Designed for Raspberry Pi, cloud, or on-prem deployment
 - Fully open source and community maintained
@@ -40,7 +40,7 @@ This is a test server and may be subject to unannounced or unplanned updates.
 Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
 
 ### /etc/hosts file modification
-The original vision of OHB was to use a 'DNS sinkhole' concept. This will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. This is a semi-permanent change.
+These steps will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. This is a semi-permanent change.
 
 ```sudo nano /etc/hosts```
 
