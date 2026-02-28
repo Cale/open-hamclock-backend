@@ -24,8 +24,8 @@ All maps are generated on your own self hosted hardware. VOACAP is in work.
 
 - Eliminates dependency on CSI (VOACAP and PskReporter is in work)
 - Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc) all on your own hardware
-- Generates map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.)
-- Produces zlib-compressed BMP assets in multiple resolutions
+- Generates faithful CSI-style map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.) Note: maps may vary due to differences that are unknown and inaccesible to us
+- Produces zlib-compressed BMP assets in multiple resolutions using the same specialized, RGB top down approach that is required by HamClock
 - Designed for Raspberry Pi, cloud, or on-prem deployment
 - Fully open source and community maintained
 - Auto log rotation
