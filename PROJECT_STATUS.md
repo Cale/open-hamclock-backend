@@ -3,6 +3,8 @@
 Each supporting file type has a data generation script. These scripts operate on a schedule that is defined in a [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab). The crontab has been specifically tuned to match as close as possible the original ClearSkyInstitute data generation times and be friendly to CPU/MEM on the host. 
 
 ### Dynamic Text Files
+These are replaced dynamically in the background on the target host per the baselined [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab).
+
 - [x] [Bz/Bz.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/bz_simple.py)
 - [x] [aurora/aurora.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_aurora.sh)
 - [x] [xray/xray.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/xray_simple.py)
@@ -25,6 +27,8 @@ Each supporting file type has a data generation script. These scripts operate on
 ### Dynamic Map Files
 Note: Anything under maps/ is considered a "Core Map" in HamClock
 
+These are replaced dynamically in the background on the target host per the baselined [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab).
+
 - [x] [maps/Clouds*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_cloud_maps.sh)
 - [x] maps/Countries* - reuse from CSI; no need to regenerate
 - [x] [maps/Wx-mB*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh)
@@ -36,6 +40,8 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] [SDO/*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_all_sdo.sh)
 
 ### Dynamic Web Endpoints
+These are endpoints that dynamically return data based on query parameters to the Perl scripts. Query parameters can be 0..Many.
+
 - [x] [ham/HamClock/RSS/web15rss.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/RSS/web15rss.pl) and this [job](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/web15rss_fetch.py) makes the file
 - [x] [ham/HamClock/version.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/version.pl)
 - [x] [ham/HamClock/wx.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/wx.pl)
@@ -49,6 +55,7 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] [ham/HamClock/fetchRBN.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/fetchRBN.pl)
 
 ### Static Files
+These files never change or are unlikely to need change any time soon.
 - [x] [ham/HamClock/cities2.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/cities2.txt) - we did not update this file as it appears to require no change
 - [x] [ham/HamClock/NOAASpaceWx/rank2_coeffs.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/NOAASpaceWX/rank2_coeffs.txt) - we did not update this file as it appears to require no change
 
