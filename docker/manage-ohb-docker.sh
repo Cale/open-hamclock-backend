@@ -421,7 +421,9 @@ docker_compose_up() {
         echo "OHB is already running."
         RETVAL=1
     else
-        docker_compose_yml && docker compose -f <(echo "$DOCKER_COMPOSE_YML") create 
+        docker_compose_yml && docker compose -f <(echo "$DOCKER_COMPOSE_YML") create
+        RETVAL=$?
+        [ $RETVAL -ne 0 ] && return $RETVAL
         if [ -n "$REQUESTED_ENV_FILE" -o -n "$STICKY_LIGHTTPD_ENV_FILE" -o -r "$DEFAULT_ENV_FILE" ]; then
             copy_env_to_container >/dev/null
         fi
@@ -650,6 +652,16 @@ determine_tag() {
 
     # third precedence
     elif [ -n "$GIT_TAG" ]; then 
+        if [ ${FUNCNAME[3]} == upgrade_ohb -a "$GIT_TAG" != "$OHB_MANAGER_VERSION" ]; then
+            echo
+            echo "WARNING:"
+            echo "         You are in a git repository on tag: '$GIT_TAG'"
+            echo "         Your version of '$THIS' is: '$OHB_MANAGER_VERSION'"
+            echo
+            echo "Please run upgrade again setting the version with the -t option."
+            echo
+            return 1
+        fi
         TAG=$GIT_TAG
 
     # forth precedence
@@ -662,7 +674,7 @@ determine_tag() {
 docker_compose_yml() {
     determine_port
 
-    determine_tag
+    determine_tag || return $?
     IMAGE=$IMAGE_BASE:$TAG
 
     determine_dashboard
