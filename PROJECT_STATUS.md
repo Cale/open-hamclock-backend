@@ -44,7 +44,7 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [ ] ham/HamClock/fetchVOACAPArea.pl - proxied by CSI until we can work out complex task
 - [ ] ham/HamClock/fetchVOACAP-MUF.pl - proxied by CSI until we can work out complex task
 - [ ] ham/HamClock/fetchVOACAP-TOA.pl - proxied by CSI until we can work out complex task
-- [x] ham/HamClock/fetchPSKReporter.pl=
+- [ ] ham/HamClock/fetchPSKReporter.pl - currently proxied, it is implemented however it will be subject to rate limiting if deployed centrally. I have created a PSK Reporter proxy as of last week (https://github.com/BrianWilkinsFL/ohb-pskreporter-proxy)
 - [x] ham/HamClock/fetchWSPR.pl
 - [x] ham/HamClock/fetchRBN.pl
 
