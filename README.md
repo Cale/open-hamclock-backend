@@ -7,6 +7,8 @@ When the original backend went dark, the clocks didn’t have to.
 
 🧱 Open-source, self-hostable backend replacement for HamClock — restoring live propagation data, maps, and feeds.
 
+OHB currently proxies VOACAP and PSKReporter. All other feeds and maps are generated locally. Backend selection remains user-controlled.
+
 What's a backend? It is how HamClock got all of its data. Without a separate backend, all HamClock's will cease to function by June 2026.
 
 Drop-in compatible with existing HamClock's — no firmware changes required.
@@ -14,15 +16,18 @@ Drop-in compatible with existing HamClock's — no firmware changes required.
 OHB provides faithful replacements for the data feeds and map assets
 that HamClock depends on — built by operators, for operators.
 
+All maps are generated on your own self hosted hardware. VOACAP is in work. 
+
 > This project is not affiliated with HamClock or its creator,
 > Elwood Downey, WB0OEW.
 > We extend our sincere condolences to the Downey family.
 
 ## ⚙️ What OHB Does
 
-- Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc)
-- Generates map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.)
-- Produces zlib-compressed BMP assets in multiple resolutions
+- Implements a self-hosted backend compatible with the HamClock backend interface
+- Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc) all on your own hardware
+- Generates faithful HamClock-style map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.) Note: Maps may vary slightly due to upstream model differences
+- Produces zlib-compressed BMP assets in multiple resolutions using the same specialized, RGB top down approach that is required by HamClock
 - Designed for Raspberry Pi, cloud, or on-prem deployment
 - Fully open source and community maintained
 - Auto log rotation
@@ -37,7 +42,7 @@ This is a test server and may be subject to unannounced or unplanned updates.
 Important: Editing your hosts file overrides normal DNS for the specified hostname. After this change, anything on this computer that connects to clearskyinstitute.com will go to the OHB test server instead.
 
 ### /etc/hosts file modification
-The original vision of OHB was to use a 'DNS sinkhole' concept. This will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. This is a semi-permanent change.
+These steps will tell your system to not use clearskyinstitute.com if you do not use the -b option for local install. For now, **do not** use this option if you are self-hosting. This is a semi-permanent change.
 
 ```sudo nano /etc/hosts```
 
@@ -81,6 +86,10 @@ and if hamclock is installed in your PATH on the system then it will tell you wh
 
 ### Transitioning? Be sure to clear your .hamclock cache
 For users transitioning immediately from ClearSkyInstitute or another backend server, it is important that you clear these two file types to ensure you pull latest upon connecting to either your local backend or the central backend. This involves deleting *.bmp and *.txt from your .hamclock cache directory. Do not delete the eeprom file or you will lose your settings. 
+```
+rm /root/.hamclock/*.bmp /root/.hamclock/*.txt
+rm /home/*/.hamclock/*.txt /home/*/.hamclock/*.bmp
+```
 
 ## 🧭 Architecture
 ```
