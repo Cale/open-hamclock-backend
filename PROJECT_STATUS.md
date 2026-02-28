@@ -29,15 +29,15 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 
 These are replaced dynamically in the background on the target host per the baselined [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab).
 
-- [x] [maps/Clouds*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_cloud_maps.sh)
+- [x] [maps/Clouds*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_cloud_maps.sh) - Clouds map display
 - [x] maps/Countries* - reuse from CSI; no need to regenerate
-- [x] [maps/Wx-mB*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh)
-- [x] [maps/Wx-in*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh)
-- [x] [maps/Aurora](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_aurora_maps.sh)
-- [x] [maps/DRAP*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_drap_maps.sh)
-- [x] [maps/MUF-RT*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/kc2g_muf_heatmap.sh)
-- [x] maps/Terrain* - reuse from CSI; no need to regenerate
-- [x] [SDO/*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_all_sdo.sh)
+- [x] [maps/Wx-mB*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh) - Weather map display (millibar)
+- [x] [maps/Wx-in*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_wx_mb_maps.sh) - Weather map display (inches)
+- [x] [maps/Aurora](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_aurora_maps.sh) - Aurora map display
+- [x] [maps/DRAP*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_drap_maps.sh) - DRAP map display
+- [x] [maps/MUF-RT*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/kc2g_muf_heatmap.sh) - MUF RT display based on kc2g propagation map engine
+- [x] maps/Terrain* - reuse from CSI; no need to regenerate; Terrain map display
+- [x] [SDO/*](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_all_sdo.sh) - images of the Sun for the SDO pane
 
 ### Dynamic Web Endpoints
 These are endpoints that dynamically return data based on query parameters to the Perl scripts. Query parameters can be 0..Many.
