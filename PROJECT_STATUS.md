@@ -54,6 +54,8 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 
 ## Integration Testing Status
 - [x] GOES-16 X-Ray
+- [x] IP Geo Location at startup
+- [x] Remote Address Reporting at startup 
 - [x] Countries map download and display (all sizes)
 - [x] Terrain map download and display (all sizes)
 - [x] SDO generation, download, and display
