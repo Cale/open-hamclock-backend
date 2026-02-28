@@ -49,27 +49,30 @@ Note: Anything under maps/ is considered a "Core Map" in HamClock
 - [x] [ham/HamClock/fetchRBN.pl](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/fetchRBN.pl)
 
 ### Static Files
-- [x] ham/HamClock/cities2.txt - we did not update this file as it appears to require no change
-- [x] ham/HamClock/NOAASpaceWx/rank2_coeffs.txt - we did not update this file as it appears to require no change
+- [x] [ham/HamClock/cities2.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/cities2.txt) - we did not update this file as it appears to require no change
+- [x] [ham/HamClock/NOAASpaceWx/rank2_coeffs.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/ham/HamClock/NOAASpaceWX/rank2_coeffs.txt) - we did not update this file as it appears to require no change
 
 ## Integration Testing Status
 - [x] GOES-16 X-Ray
-- [x] Countries map download
-- [x] Terrain map download
+- [x] Countries map download and display (all sizes)
+- [x] Terrain map download and display (all sizes)
 - [x] SDO generation, download, and display
-- [x] MUF-RT map generation, download, and display
-- [x] Weather map generation, download, and display
-- [x] Clouds map generation, download, and display
-- [x] Aurora map generation, download, and display
-- [x] Aurora map generation, download, and display
-- [x] Parks on the Air generation, pull and display
-- [x] SSN generation, pull, and display
+- [x] MUF-RT map generation, download, and display (all sizes)
+- [x] Weather map generation, download, and display (all sizes in mB and in)
+- [x] Clouds map generation, download, and display (all sizes)
+- [x] Aurora map generation, download, and display (all sizes)
+- [x] POTA, SOTA, WWFF generation, pull and display
+- [x] SSN + history generation, pull, and display
 - [x] Solar wind generation, pull and display
 - [x] DRAP data generation, pull and display
 - [x] Planetary Kp data generation, pull and display
-- [x] Solar flux data generation, pull and display
-- [x] Amateur Satellites data generation, pull and display
-- [x] PSK Reporter WSPR
+- [x] Solar flux + history data generation, pull and display
+- [x] Amateur Satellites data generation, pull and display + [active AMSAT status satellite filter](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/filter_amsat_active.pl)
+- [x] PSK Reporter WSPR request and display
+- [x] PSK Reporter Spots request and display - proxied
+- [ ] PSK Reporter Spots - non proxied
 - [X] VOACAP DE DX - proxied
-- [x] VOACAP MUF MAP - proxied
-- [x] RBN
+- [ ] VOACAP DE DX - non proxied
+- [x] VOACAP MUF MAP (REL/TOA) - proxied
+- [ ] VOACAP MUF MAP (REL/TOA) - non proxied
+- [x] RBN request and display
