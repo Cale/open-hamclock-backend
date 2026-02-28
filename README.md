@@ -22,7 +22,8 @@ All maps are generated on your own self hosted hardware. VOACAP is in work.
 
 ## ⚙️ What OHB Does
 
-- Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc)
+- Eliminates dependency on CSI (VOACAP is in work)
+- Rebuilds HamClock dynamic text feeds (solar, geomag, DRAP, PSK, RBN, WSPR, Amateur Satellites, DxNews, Contests, etc) all on your own hardware
 - Generates map overlays (MUF-RT, DRAP, Aurora, Wx-mB, etc.)
 - Produces zlib-compressed BMP assets in multiple resolutions
 - Designed for Raspberry Pi, cloud, or on-prem deployment
