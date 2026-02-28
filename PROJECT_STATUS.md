@@ -5,24 +5,24 @@ Each supporting file type has a data generation script. These scripts operate on
 ### Dynamic Text Files
 These are replaced dynamically in the background on the target host per the baselined [crontab](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/crontab).
 
-- [x] [Bz/Bz.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/bz_simple.py)
-- [x] [aurora/aurora.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_aurora.sh)
-- [x] [xray/xray.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/xray_simple.py)
-- [x] [worldwx/wx.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_world_wx.pl)
-- [x] [esats/esats.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/fetch_tle.sh)
-- [x] [solarflux/solarflux-history.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_solarflux-history.sh)
-- [x] [ssn/ssn-history.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_ssn_history.pl)
-- [x] [solar-flux/solarflux-99.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/flux_simple.py)
-- [x] [geomag/kindex.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/kindex_simple.py)
-- [x] [dst/dst.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/dst_simple.py)
-- [x] [drap/stats.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_drap.sh)
-- [x] [solar-wind/swind-24hr.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/swind_simple.py)
-- [x] [ssn/ssn-31.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/ssn_simple.py)
-- [x] [ONTA/onta.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_onta.pl)
-- [x] [contests/contests311.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_contest-calendar.sh)
-- [x] [dxpeds/dxpeditions.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_dxpeditions_spots.py)
-- [x] [NOAASpaceWX/noaaswx.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_noaaswx.sh)
-- [x] [cty/cty_wt_mod-ll-dxcc.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_cty_wt_mod.sh)
+- [x] [Bz/Bz.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/bz_simple.py) - Bz pane
+- [x] [aurora/aurora.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_aurora.sh) - Aurora pane
+- [x] [xray/xray.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/xray_simple.py) - GOES 16 X-Ray pane
+- [x] [worldwx/wx.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/update_world_wx.pl) - weather display on map hover
+- [x] [esats/esats.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/fetch_tle.sh) - supports satellite list under DX
+- [x] [solarflux/solarflux-history.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_solarflux-history.sh) - supports solar flux history display when clicking solar flux pane
+- [x] [ssn/ssn-history.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_ssn_history.pl) - supports sun spot number history display when clicking sun spot number pane 
+- [x] [solar-flux/solarflux-99.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/flux_simple.py) - supports solar flux pane
+- [x] [geomag/kindex.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/kindex_simple.py) - supports planetary kp pane
+- [x] [dst/dst.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/dst_simple.py) - supports disturbances pane
+- [x] [drap/stats.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_drap.sh) - supports drap pane
+- [x] [solar-wind/swind-24hr.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/swind_simple.py) - supports solar wind pane
+- [x] [ssn/ssn-31.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/ssn_simple.py) - supports (smoothed) sunspot number pane
+- [x] [ONTA/onta.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_onta.pl) - generates OTA spots (POTA, SOTA, WWFF) on schedule per crontab
+- [x] [contests/contests311.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_contest-calendar.sh) - generates list of recent contests for contests pane
+- [x] [dxpeds/dxpeditions.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_dxpeditions_spots.py) - generates list of dxpeds for dxpeds pane
+- [x] [NOAASpaceWX/noaaswx.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_noaaswx.sh) - generates NOAA Space Wx metrics for NOAA Space Wx pane
+- [x] [cty/cty_wt_mod-ll-dxcc.txt](https://github.com/BrianWilkinsFL/open-hamclock-backend/blob/main/scripts/gen_cty_wt_mod.sh) - used to correlate spots for DXCC
       
 ### Dynamic Map Files
 Note: Anything under maps/ is considered a "Core Map" in HamClock
