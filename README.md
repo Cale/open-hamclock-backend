@@ -14,6 +14,8 @@ Drop-in compatible with existing HamClock's — no firmware changes required.
 OHB provides faithful replacements for the data feeds and map assets
 that HamClock depends on — built by operators, for operators.
 
+All maps are generated on your own self hosted hardware. VOACAP is in work. 
+
 > This project is not affiliated with HamClock or its creator,
 > Elwood Downey, WB0OEW.
 > We extend our sincere condolences to the Downey family.
